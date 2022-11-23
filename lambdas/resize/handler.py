@@ -15,7 +15,7 @@ ssm: "SSMClient" = boto3.client("ssm")
 
 
 def get_bucket_name() -> str:
-    parameter = ssm.get_parameter(Name="/localstack-thumbnail-app/buckets/resized")
+    parameter = ssm.get_parameter(Name="/localstack-thumbnail-app/buckets/WRONG_KEY_NAME")
     return parameter["Parameter"]["Value"]
 
 
