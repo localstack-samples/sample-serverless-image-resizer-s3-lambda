@@ -6,11 +6,6 @@
 .coverage.*
 htmlcov
 
-.cache
-.filesystem
-/infra/
-localstack/infra/
-
 /node_modules/
 package-lock.json
 /nosetests.xml
@@ -57,8 +52,10 @@ requirements.copy.txt
 venv
 api_states
 
-/integration/lambdas/golang/handler.zip
-/tests/integration/lambdas/golang/handler.zip
 tmp/
 
 volume/
+
+# lambda packages
+lambdas/*/package/
+lambdas/*/lambda.zip

@@ -1,0 +1,8 @@
+boto3
+requests>=2.20
+Pillow==9.2.0
+mypy_boto3_ssm
+mypy_boto3_sns
+mypy_boto3_s3
+black
+pytest
