@@ -18,6 +18,7 @@ def get_bucket_name() -> str:
 
 
 def handler(event, context):
+    raise ValueError("no key given")
     bucket = get_bucket_name()
 
     key = event["rawPath"].lstrip("/")
