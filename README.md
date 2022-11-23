@@ -4,13 +4,7 @@ Make sure you use the same version as the Python Lambdas to make Pillow work (3.
 
 ## Overview
 
-TODO: image
-
-## Use Terraform
-
-```bash
-tflocal init && tflocal apply 
-```
+![Screenshot at 2022-11-23 16-34-12](https://user-images.githubusercontent.com/3996682/203586505-e54ccb3e-5101-4ee8-917d-d6372ee965ef.png)
 
 ## Create the infrastructure manually
 
