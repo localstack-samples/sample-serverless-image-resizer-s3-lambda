@@ -38,7 +38,7 @@ def handler(event, context):
     target_bucket = get_bucket_name()
 
     for record in event["Records"]:
-        source_bucket = record['s3']['bucket']['name']
+        source_bucket = record["s3"]["bucket"]["name"]
         key = unquote_plus(record["s3"]["object"]["key"])
         print(source_bucket, key)
 

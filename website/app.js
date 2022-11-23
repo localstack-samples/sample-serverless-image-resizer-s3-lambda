@@ -32,18 +32,23 @@
                     $("#" + key).val(fields[key]);
                 }
 
+                let formData = new FormData($("#uploadForm")[0]);
+                console.log("sending form data", formData);
+
                 $.ajax({
-                    type: 'POST',
+                    type: "POST",
                     url: data['url'],
-                    data: new FormData($("#uploadForm")[0]),
+                    data: formData,
                     processData: false,
                     contentType: false,
                     success: function () {
                         alert("success!");
                     },
+                    error: function() {
+                        alert("error! check the logs");
+                    },
                     complete: function (event) {
                         console.log("done", event);
-                        alert("error uploading. check the logs!")
                         $("#uploadForm button").removeClass('disabled');
                     }
                 });
