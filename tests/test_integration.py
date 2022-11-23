@@ -19,7 +19,7 @@ ssm: "SSMClient" = boto3.client(
 
 
 def test_s3_resize_integration():
-    file = "nyan-cat.png"
+    file = os.path.join(os.path.dirname(__file__), "nyan-cat.png")
     key = os.path.basename(file)
 
     parameter = ssm.get_parameter(Name="/localstack-thumbnail-app/buckets/images")
@@ -44,16 +44,14 @@ def test_s3_resize_integration():
         Bucket=target_bucket, Key=key, Filename="/tmp/nyan-cat-resized.png"
     )
 
-    assert (
-        os.stat("/tmp/nyan-cat-resized.png").st_size < os.stat(key).st_size
-    )
+    assert os.stat("/tmp/nyan-cat-resized.png").st_size < os.stat(file).st_size
 
     s3.delete_object(Bucket=source_bucket, Key=key)
     s3.delete_object(Bucket=target_bucket, Key=key)
 
 
 def test_failure_sns_to_ses_integration():
-    file = "some-file.txt"
+    file = os.path.join(os.path.dirname(__file__), "some-file.txt")
     key = f"{uuid.uuid4()}-{os.path.basename(file)}"
 
     parameter = ssm.get_parameter(Name="/localstack-thumbnail-app/buckets/images")
@@ -63,8 +61,8 @@ def test_failure_sns_to_ses_integration():
 
     def _check_message():
         response = requests.get("http://localhost:4566/_localstack/ses")
-        messages = response.json()['messages']
-        assert key in messages[-1]['Body']['text_part']
+        messages = response.json()["messages"]
+        assert key in messages[-1]["Body"]["text_part"]
 
     # retry to check for the message
     for i in range(9):
