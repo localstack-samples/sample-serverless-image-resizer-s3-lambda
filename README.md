@@ -1,10 +1,26 @@
 # Serverless image resizer
 
-Make sure you use the same version as the Python Lambdas to make Pillow work (3.9)
+A serverless application that demos several AWS functionalities on LocalStack:
+* S3
+* S3 bucket notifications to trigger a Lambda
+* S3 pre-signed POST
+* S3 website
+* SSM
+* Lambda
+* Lambda function URLs
+* Lambda SNS on failure destination
+* SNS to SES Subscriptions
+* SES LocalStack testing endpoint
+
+Moreover, the repo includes a GitHub actions workflow to demonstrate how to run end-to-end tests of your AWS apps using LocalStack in CI.
 
 ## Overview
 
 ![Screenshot at 2022-11-23 16-34-12](https://user-images.githubusercontent.com/3996682/203586505-e54ccb3e-5101-4ee8-917d-d6372ee965ef.png)
+
+## Prerequisites
+
+Make sure you use the same version as the Python Lambdas to make Pillow work (3.9)
 
 ## Create the infrastructure manually
 
