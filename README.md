@@ -14,15 +14,49 @@ A serverless application that demos several AWS functionalities on LocalStack:
 
 Moreover, the repo includes a GitHub actions workflow to demonstrate how to run end-to-end tests of your AWS apps using LocalStack in CI.
 
+Here's the app in action:
+
 ## Overview
 
 ![Screenshot at 2022-11-23 16-34-12](https://user-images.githubusercontent.com/3996682/203586505-e54ccb3e-5101-4ee8-917d-d6372ee965ef.png)
 
 ## Prerequisites
 
-Make sure you use the same version as the Python Lambdas to make Pillow work (3.9)
+### Dev environment
+
+Make sure you use the same version as the Python Lambdas to make Pillow work.
+If you use pyenv, then first install and activate Python 3.9:
+```bash
+pyenv install 3.9.16
+pyenv global 3.9.16
+```
+
+```console
+% python --version
+Python 3.9.16
+```
+
+Create a virtualenv and install all the development dependencies there:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+```
+
+### LocalStack
+
+Start LocalStack Pro with the appropriate CORS configuration for the S3 Website:
+
+```bash
+export EXTRA_CORS_ALLOWED_ORIGINS=webapp.s3-website.localhost.localstack.cloud:4566
+LOCALSTACK_API_KEY=... localstack start
+```
 
 ## Create the infrastructure manually
+
+You can create the AWS infrastructure on LocalStack by running `bin/deploy.sh`.
+Here are instructions to deploy it manually step-by-step.
 
 ### Create the buckets
 
@@ -36,8 +70,8 @@ awslocal s3 mb s3://localstack-thumbnails-app-resized
 ### Put the bucket names into the parameter store
 
 ```bash
-awslocal ssm put-parameter --name /localstack-thumbnail-app/buckets/images --value "localstack-thumbnails-app-images"
-awslocal ssm put-parameter --name /localstack-thumbnail-app/buckets/resized --value "localstack-thumbnails-app-resized"
+awslocal ssm put-parameter --name /localstack-thumbnail-app/buckets/images --type "String" --value "localstack-thumbnails-app-images"
+awslocal ssm put-parameter --name /localstack-thumbnail-app/buckets/resized --type "String" --value "localstack-thumbnails-app-resized"
 ```
 
 ### Create the DLQ Topic for failed lambda invokes
@@ -81,7 +115,7 @@ awslocal lambda create-function-url-config \
     --auth-type NONE
 ```
 
-Copy the `FunctionUrl` from the response!
+Copy the `FunctionUrl` from the response, you will need it later to make the app work.
 
 ### Resizer Lambda
 
@@ -121,15 +155,27 @@ awslocal s3 sync --delete ./website s3://webapp
 awslocal s3 website s3://webapp --index-document index.html
 ```
 
-Then visit http://webapp.s3-website.localhost.localstack.cloud:4566
+## Using the app
 
+Once deployed, visit http://webapp.s3-website.localhost.localstack.cloud:4566
 
-## Develop locally
+Paste the Function URL of the presign Lambda you created earlier into the form field.
+If you use LocalStack's v2 Lambda provider then you can also get the URL by running:
+```bash
+awslocal lambda list-function-url-configs --function-name presign
+```
 
-Create a virtualenv and install all the dependencies there:
+After uploading a file, you can download the resized file from the `localstack-thumbnails-app-resized` bucket.
+
+## Run integration tests
+
+Once all resource are created on LocalStack, you can run the automated integration tests.
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements-dev.txt
+pytest tests/
 ```
+
+## GitHub Action
+
+The demo LocalStack in CI, `.github/workflows/integration-test.yml` contains a GitHub Action that starts up LocalStack,
+deploys the infrastructure to it, and then runs the integration tests.

@@ -6,3 +6,5 @@ mypy_boto3_sns
 mypy_boto3_s3
 black
 pytest
+awscli
+awscli-local

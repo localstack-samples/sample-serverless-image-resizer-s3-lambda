@@ -3,8 +3,8 @@
 awslocal s3 mb s3://localstack-thumbnails-app-images
 awslocal s3 mb s3://localstack-thumbnails-app-resized
 
-awslocal ssm put-parameter --name /localstack-thumbnail-app/buckets/images --value "localstack-thumbnails-app-images"
-awslocal ssm put-parameter --name /localstack-thumbnail-app/buckets/resized --value "localstack-thumbnails-app-resized"
+awslocal ssm put-parameter --name /localstack-thumbnail-app/buckets/images --type "String" --value "localstack-thumbnails-app-images"
+awslocal ssm put-parameter --name /localstack-thumbnail-app/buckets/resized --type "String" --value "localstack-thumbnails-app-resized"
 
 awslocal sns create-topic --name failed-resize-topic
 awslocal sns subscribe \
