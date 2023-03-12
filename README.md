@@ -1,5 +1,8 @@
 # Serverless image resizer
 
+[![LocalStack Pods Launchpad](https://localstack.cloud/gh/launch-pod-badge.svg)](https://app.localstack.cloud/launchpad?url=https://github.com/thrau/serverless-image-resizer/releases/download/v0.1.0/serverless-image-resizer-cloudpod-v0.1.0.zip)
+
+
 A serverless application that demos several AWS functionalities on LocalStack:
 * S3
 * S3 bucket notifications to trigger a Lambda
