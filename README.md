@@ -1,29 +1,41 @@
 # Serverless image resizer
 
-[![LocalStack Pods Launchpad](https://localstack.cloud/gh/launch-pod-badge.svg)](https://app.localstack.cloud/launchpad?url=https://github.com/thrau/serverless-image-resizer/releases/download/v0.1.0/serverless-image-resizer-cloudpod-v0.1.0.zip)
+| Key          | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Environment  | <img src="https://img.shields.io/badge/LocalStack-deploys-4D29B4.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAKgAAACoABZrFArwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAALbSURBVHic7ZpNaxNRFIafczNTGIq0G2M7pXWRlRv3Lusf8AMFEQT3guDWhX9BcC/uFAr1B4igLgSF4EYDtsuQ3M5GYrTaj3Tmui2SpMnM3PlK3m1uzjnPw8xw50MoaNrttl+r1e4CNRv1jTG/+v3+c8dG8TSilHoAPLZVX0RYWlraUbYaJI2IuLZ7KKUWCisgq8wF5D1A3rF+EQyCYPHo6Ghh3BrP8wb1en3f9izDYlVAp9O5EkXRB8dxxl7QBoNBpLW+7fv+a5vzDIvVU0BELhpjJrmaK2NMw+YsIxunUaTZbLrdbveZ1vpmGvWyTOJToNlsuqurq1vAdWPMeSDzwzhJEh0Bp+FTmifzxBZQBXiIKaAq8BBDQJXgYUoBVYOHKQRUER4mFFBVeJhAQJXh4QwBVYeHMQJmAR5GCJgVeBgiYJbg4T8BswYPp+4GW63WwvLy8hZwLcd5TudvBj3+OFBIeA4PD596nvc1iiIrD21qtdr+ysrKR8cY42itCwUP0Gg0+sC27T5qb2/vMunB/0ipTmZxfN//orW+BCwmrGV6vd63BP9P2j9WxGbxbrd7B3g14fLfwFsROUlzBmNM33XdR6Meuxfp5eg54IYxJvXCx8fHL4F3w36blTdDI4/0WREwMnMBeQ+Qd+YC8h4g78wF5D1A3rEqwBiT6q4ubpRSI+ewuhP0PO/NwcHBExHJZZ8PICI/e73ep7z6zzNPwWP1djhuOp3OfRG5kLROFEXv19fXP49bU6TbYQDa7XZDRF6kUUtEtoFb49YUbh/gOM7YbwqnyG4URQ/PWlQ4ASllNwzDzY2NDX3WwioKmBgeqidgKnioloCp4aE6AmLBQzUExIaH8gtIBA/lFrCTFB7KK2AnDMOrSeGhnAJSg4fyCUgVHsolIHV4KI8AK/BQDgHW4KH4AqzCQwEfiIRheKKUAvjuuu7m2tpakPdMmcYYI1rre0EQ1LPo9w82qyNziMdZ3AAAAABJRU5ErkJggg=="> [![LocalStack Pods Launchpad](https://localstack.cloud/gh/launch-pod-badge.svg)](https://app.localstack.cloud/launchpad?url=https://github.com/thrau/serverless-image-resizer/releases/download/v0.1.0/serverless-image-resizer-cloudpod-v0.1.0.zip) |
+| Services     | S3, SSM, Lambda, SNS, SES                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Integrations | GitHub actions, pytest                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Categories   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| Level        | Intermediate                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 
-A serverless application that demos several AWS functionalities on LocalStack:
-* S3
+## Introduction
+
+This is an app to resize images uploaded to S3 in a serverless way.
+We use a Lambda to generate S3 pre-signed URLs so the upload form can upload directly to S3 rather than going through the lambda.
+S3 bucket notifications are used to trigger a python Lambda that runs image resizing.
+We also demonstrate how Lambda failures can submit to SNS, which can then trigger an SES email.
+Using the LocalStack internal `/_localstack/aws/ses` endpoint, we can run end-to-end integration tests to verify that emails have been sent correctly.
+
+Here's a short summary of AWS service features we use:
 * S3 bucket notifications to trigger a Lambda
 * S3 pre-signed POST
 * S3 website
-* SSM
-* Lambda
 * Lambda function URLs
 * Lambda SNS on failure destination
 * SNS to SES Subscriptions
 * SES LocalStack testing endpoint
 
 Moreover, the repo includes a GitHub actions workflow to demonstrate how to run end-to-end tests of your AWS apps using LocalStack in CI.
+The GitHub workflow runs a set of integration tests using pytest.
 
 Here's the app in action:
 
-
 https://user-images.githubusercontent.com/3996682/224579411-400e8ea5-1f61-4c34-84ae-9a21e760eff7.mp4
 
+## Architecture diagram
 
-## Overview
+The following diagram shows the architecture that this sample application builds and deploys:
 
 ![Screenshot at 2022-11-23 16-34-12](https://user-images.githubusercontent.com/3996682/203586505-e54ccb3e-5101-4ee8-917d-d6372ee965ef.png)
 
@@ -60,7 +72,7 @@ export EXTRA_CORS_ALLOWED_ORIGINS=webapp.s3-website.localhost.localstack.cloud:4
 LOCALSTACK_API_KEY=... localstack start
 ```
 
-## Create the infrastructure manually
+## Instructions
 
 You can create the AWS infrastructure on LocalStack by running `bin/deploy.sh`.
 Here are instructions to deploy it manually step-by-step.
@@ -162,7 +174,7 @@ awslocal s3 sync --delete ./website s3://webapp
 awslocal s3 website s3://webapp --index-document index.html
 ```
 
-## Using the app
+### Using the app
 
 Once deployed, visit http://webapp.s3-website.localhost.localstack.cloud:4566
 
@@ -174,7 +186,7 @@ awslocal lambda list-function-url-configs --function-name presign
 
 After uploading a file, you can download the resized file from the `localstack-thumbnails-app-resized` bucket.
 
-## Run integration tests
+### Run integration tests
 
 Once all resource are created on LocalStack, you can run the automated integration tests.
 
@@ -182,7 +194,10 @@ Once all resource are created on LocalStack, you can run the automated integrati
 pytest tests/
 ```
 
-## GitHub Action
+### GitHub Action
 
 The demo LocalStack in CI, `.github/workflows/integration-test.yml` contains a GitHub Action that starts up LocalStack,
 deploys the infrastructure to it, and then runs the integration tests.
+
+## Learn more
+
