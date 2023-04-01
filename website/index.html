@@ -1,65 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Serverless image resizer</title>
+  <meta charset="UTF-8">
+  <title>Serverless image resizer</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
-          crossorigin="anonymous">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
-          rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+        crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+        rel="stylesheet">
 </head>
 <body>
 
 <div class="col-lg-8 mx-auto p-4 py-md-5">
-    <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
-        <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
-            <span class="fs-5"><i class="bi bi-images fs-4"></i> Serverless thumbnail generator</span>
-        </a>
-    </header>
+  <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
+    <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+      <span class="fs-5"><i class="bi bi-images fs-4"></i> Serverless thumbnail generator</span>
+    </a>
+  </header>
 
-    <main>
-        <h1 class="h4">Upload your file <i class="bi bi-cloud-upload"></i></h1>
-        <hr>
-        <div class="card">
-            <div class="card-header">
-                Input
-            </div>
-            <div class="card-body">
-                <h5 class="card-title">Form</h5>
-                <p class="card-text">This form requests from a Lambda a S3 pre-signed POST URL, and then forwards the
-                    upload there.</p>
-                <form id="uploadForm" action="#" , method="post">
-                    <div class="mb-3">
-                        <label class="form-label" for="presignerUrl">Function URL of the pre-sign Lambda</label>
-                        <input type="text" class="form-control" id="presignerUrl" required/>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" for="customFile">Select your file to upload</label>
-                        <input type="file" class="form-control" id="customFile" name="file" required/>
-                    </div>
-                    <div class="mb-3">
-                        <button type="submit" class="btn btn-primary mb-3">Upload <i
-                                class="bi bi-cloud-upload-fill"></i></button>
-                    </div>
+  <section>
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-gear"></i> Configuration
+      </div>
+      <div class="card-body">
+        <h5 class="card-text">
+          Set the Lambda Function URLs here
+        </h5>
+        <form id="configForm" action="#" method="post">
+          <div class="mb-3">
+            <label class="form-label" for="functionUrlPresign">
+              Function URL of the <code>presign</code> Lambda
+            </label>
+            <input type="text" class="form-control" id="functionUrlPresign"  autocomplete="false"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="functionUrlList">
+              Function URL of the <code>list</code> Lambda
+            </label>
+            <input type="text" class="form-control" id="functionUrlList" autocomplete="false"/>
+          </div>
+          <div class="mb-3">
+            <button type="submit" name="save" class="btn btn-primary mb-3">Apply</button>
+            <button type="submit" name="clear" class="btn btn-secondary mb-3">Clear</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
 
-                    <input type="hidden" name="key" id="key">
-                    <input type="hidden" name="AWSAccessKeyId" id="AWSAccessKeyId">
-                    <input type="hidden" name="policy" id="policy">
-                    <input type="hidden" name="signature" id="signature">
-                </form>
-            </div>
-        </div>
+  <section class="mt-4">
+    <h1 class="h4">Upload your file <i class="bi bi-cloud-upload"></i></h1>
+    <hr>
+    <div class="card">
+      <div class="card-header">
+        Input
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">Form</h5>
+        <p class="card-text">
+          This form calls the <code>presign</code> Lambda to request a S3 pre-signed POST URL,
+          and then forwards the POST request directly to S3.
+          Resizing the image to max 400x400 pixels happens asynchronously through S3 bucket notifications.
+          If the resizing of an image fails, then an SNS message will be sent, which will trigger an SES email
+          notification. You can find those by visiting <a href="//localhost.localstack.cloud:4566/_aws/ses">http://localhost.localstack.cloud:4566/_aws/ses</a>
+        </p>
+        <form id="uploadForm" action="#" method="post">
+          <div class="mb-3">
+            <label class="form-label" for="customFile">Select your file to upload</label>
+            <input type="file" class="form-control" id="customFile" name="file" required/>
+          </div>
+          <div class="mb-3">
+            <button type="submit" class="btn btn-primary mb-3">Upload <i
+                class="bi bi-cloud-upload-fill"></i></button>
+          </div>
 
-    </main>
+          <input type="hidden" name="key" id="key">
+          <input type="hidden" name="AWSAccessKeyId" id="AWSAccessKeyId">
+          <input type="hidden" name="policy" id="policy">
+          <input type="hidden" name="signature" id="signature">
+        </form>
+      </div>
+    </div>
+  </section>
 
-    <footer class="pt-5 my-5 text-muted border-top">
-        Created by the LocalStack team - &copy; 2022
-    </footer>
+  <section class="mt-4">
+    <div class="row">
+      <div class="col">
+        <h1 class="h4">List your files <i class="bi bi-image"></i></h1>
+      </div>
+      <div class="col text-align-right">
+        <button class="btn btn-primary" style="float: right" id="updateImageListButton">Refresh</button>
+      </div>
+    </div>
+    <p class="mt-2">
+        The images you uploaded should be shown here.
+        When the refresh action is triggered, the browser makes a request to the <code>list</code> Lambda URL
+        which returns a JSON document of all items in the images and the resized images bucket. The Javascript
+        then populates the list below using a Handlebars template.
+      </p>
+    <hr>
+    <div id="imagesContainer">
+    </div>
+  </section>
+  <footer class="pt-5 my-5 text-muted border-top">
+    Created by the LocalStack team - &copy; 2023
+  </footer>
 </div>
 
+<!-- handlebar templates -->
+<script id="image-item-template" type="text/x-handlebars-template">
+  <div class="card mt-3">
+    <div class="card-header">{{Name}}</div>
+    <div class="row justify-content">
+      <div class="col-auto">
+        <img src="{{Resized.URL}}" class="img-fluid" alt="{{Name}}">
+      </div>
+      <div class="col">
+        <div class="card-body">
+          <p class="card-text"><b>{{Name}}</b></p>
+          <p class="card-text">Timestamp: {{Timestamp}}</p>
+          <p class="card-text">
+            <a href="{{Original.URL}}">Original</a> ({{Original.Size}} bytes)
+          </p>
+          <p class="card-text">
+            <a href="{{Resized.URL}}">Resized</a> ({{Resized.Size}} bytes)
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<!-- scripts -->
 <script src="https://code.jquery.com/jquery-3.6.1.min.js"
         integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
         crossorigin="anonymous"></script>
@@ -67,6 +142,10 @@
 <!-- JavaScript Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+
+<!-- handlebars -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"
         crossorigin="anonymous"></script>
 
 <!-- client app -->

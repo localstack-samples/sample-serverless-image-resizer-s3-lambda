@@ -10,6 +10,10 @@ if typing.TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
     from mypy_boto3_ssm import SSMClient
 
+os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
+os.environ["AWS_ACCESS_KEY_ID"] = "test"
+os.environ["AWS_SECRET_ACCESS_KEY"] = "test"
+
 s3: "S3Client" = boto3.client(
     "s3", endpoint_url="http://localhost.localstack.cloud:4566"
 )

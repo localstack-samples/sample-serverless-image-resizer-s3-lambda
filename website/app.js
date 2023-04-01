@@ -1,4 +1,43 @@
 (function ($) {
+    let functionUrlPresign = localStorage.getItem("functionUrlPresign");
+    if (functionUrlPresign) {
+        $("#functionUrlPresign").val(functionUrlPresign);
+    }
+
+    let functionUrlList = localStorage.getItem("functionUrlList");
+    if (functionUrlList) {
+        console.log("function url list is", functionUrlList);
+        $("#functionUrlList").val(functionUrlList);
+    }
+
+    let imageItemTemplate = Handlebars.compile($("#image-item-template").html());
+
+    $("#configForm").submit(function (event) {
+        if (event.preventDefault)
+            event.preventDefault();
+        else
+            event.returnValue = false;
+
+        event.preventDefault();
+
+        let action = $(this).find("button[type=submit]:focus").attr('name');
+
+        if (action == "save") {
+            localStorage.setItem("functionUrlPresign", $("#functionUrlPresign").val());
+            localStorage.setItem("functionUrlList", $("#functionUrlList").val());
+            alert("Configuration saved");
+        } else if (action == "clear") {
+            localStorage.removeItem("functionUrlPresign");
+            localStorage.removeItem("functionUrlList");
+            $("#functionUrlPresign").val("")
+            $("#functionUrlList").val("")
+            alert("Configuration cleared");
+        } else {
+            alert("Unknown action");
+        }
+
+    });
+
     $("#uploadForm").submit(function (event) {
         $("#uploadForm button").addClass('disabled');
 
@@ -10,12 +49,12 @@
         event.preventDefault();
 
         let fileName = $("#customFile").val().replace(/C:\\fakepath\\/i, '');
-        let presignerUrl = $("#presignerUrl").val();
+        let functionUrlPresign = $("#functionUrlPresign").val();
 
         // modify the original form
-        console.log(fileName, presignerUrl);
+        console.log(fileName, functionUrlPresign);
 
-        let urlToCall = presignerUrl + "/" + fileName
+        let urlToCall = functionUrlPresign + "/" + fileName
         console.log(urlToCall);
 
         let form = this;
@@ -43,8 +82,9 @@
                     contentType: false,
                     success: function () {
                         alert("success!");
+                        updateImageList();
                     },
-                    error: function() {
+                    error: function () {
                         alert("error! check the logs");
                     },
                     complete: function (event) {
@@ -60,4 +100,37 @@
             }
         });
     });
+
+    function updateImageList() {
+        let listUrl = $("#functionUrlList").val();
+        if (!listUrl) {
+            alert("Please set the function URL of the list Lambda");
+            return
+        }
+
+        $.ajax({
+            url: listUrl,
+            success: function (response) {
+                $('#imagesContainer').empty(); // Empty imagesContainer
+                response.forEach(function (item) {
+                    console.log(item);
+                    let cardHtml = imageItemTemplate(item);
+                    $("#imagesContainer").append(cardHtml);
+                });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log("Error:", textStatus, errorThrown);
+                alert("error! check the logs");
+            }
+        });
+    }
+
+    $("#updateImageListButton").click(function (event) {
+        updateImageList();
+    });
+
+    if (functionUrlList) {
+        updateImageList();
+    }
+
 })(jQuery);

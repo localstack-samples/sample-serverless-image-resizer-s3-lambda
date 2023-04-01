@@ -56,7 +56,6 @@ pip install -r requirements-dev.txt
 Start LocalStack Pro with the appropriate CORS configuration for the S3 Website:
 
 ```bash
-export EXTRA_CORS_ALLOWED_ORIGINS=webapp.s3-website.localhost.localstack.cloud:4566
 LOCALSTACK_API_KEY=... localstack start
 ```
 
@@ -96,12 +95,11 @@ awslocal sns subscribe \
     --notification-endpoint my-email@example.com
 ```
 
-`awslocal sns list-topics | jq -r '.Topics[] | select(.TopicArn|test("failed-resize-topic")).TopicArn'`
-
-
 ### Create the lambdas
 
 #### S3 pre-signed POST URL generator
+
+This Lambda is responsible for generating pre-signed POST URLs to upload files to an S3 bucket.
 
 ```bash
 (cd lambdas/presign; rm -f lambda.zip; zip lambda.zip handler.py)
@@ -111,7 +109,8 @@ awslocal lambda create-function \
     --timeout 10 \
     --zip-file fileb://lambdas/presign/lambda.zip \
     --handler handler.handler \
-    --role arn:aws:iam::000000000000:role/lambda-role
+    --role arn:aws:iam::000000000000:role/lambda-role \
+    --environment Variables="{STAGE=local}"
 ```
 
 Create the function URL:
@@ -123,6 +122,29 @@ awslocal lambda create-function-url-config \
 ```
 
 Copy the `FunctionUrl` from the response, you will need it later to make the app work.
+
+### Image lister lambda
+
+The `list` Lambda is very similar:
+
+```bash
+(cd lambdas/list; rm -f lambda.zip; zip lambda.zip handler.py)
+awslocal lambda create-function \
+    --function-name list \
+    --handler handler.handler \
+    --zip-file fileb://lambdas/list/lambda.zip \
+    --runtime python3.9 \
+    --role arn:aws:iam::000000000000:role/lambda-role \
+    --environment Variables="{STAGE=local}"
+```
+
+Create the function URL:
+
+```bash
+awslocal lambda create-function-url-config \
+    --function-name list \
+    --auth-type NONE
+```
 
 ### Resizer Lambda
 
@@ -143,7 +165,8 @@ awslocal lambda create-function \
     --zip-file fileb://lambdas/resize/lambda.zip \
     --handler handler.handler \
     --dead-letter-config TargetArn=arn:aws:sns:us-east-1:000000000000:failed-resize-topic \
-    --role arn:aws:iam::000000000000:role/lambda-role
+    --role arn:aws:iam::000000000000:role/lambda-role \
+    --environment Variables="{STAGE=local}"
 ```
 
 ### Connect the S3 bucket to the resizer lambda
@@ -167,12 +190,23 @@ awslocal s3 website s3://webapp --index-document index.html
 Once deployed, visit http://webapp.s3-website.localhost.localstack.cloud:4566
 
 Paste the Function URL of the presign Lambda you created earlier into the form field.
-If you use LocalStack's v2 Lambda provider then you can also get the URL by running:
 ```bash
 awslocal lambda list-function-url-configs --function-name presign
+awslocal lambda list-function-url-configs --function-name list
 ```
 
 After uploading a file, you can download the resized file from the `localstack-thumbnails-app-resized` bucket.
+
+### Testing failures
+
+If the `resize` Lambda fails, an SNS message is sent to a topic that an SES subscription listens to.
+An email is then sent with the raw failure message.
+In a real scenario you'd probably have another lambda sitting here, but it's just for demo purposes.
+Since there's no real email server involved, you can use the [SES developer endpoint](https://docs.localstack.cloud/user-guide/aws/ses/) to list messages that were sent via SES:
+
+curl -s http://localhost.localstack.cloud:4566/_aws/ses
+
+An alternative is to use a service like MailHog or smtp4dev, and start LocalStack using `SMTP_HOST=host.docker.internal:1025` pointing to the mock SMTP server.
 
 ## Run integration tests
 

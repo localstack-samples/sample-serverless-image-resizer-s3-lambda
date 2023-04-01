@@ -19,10 +19,25 @@ awslocal lambda create-function \
     --timeout 10 \
     --zip-file fileb://lambdas/presign/lambda.zip \
     --handler handler.handler \
-    --role arn:aws:iam::000000000000:role/lambda-role
+    --role arn:aws:iam::000000000000:role/lambda-role \
+    --environment Variables="{STAGE=local}"
 
 awslocal lambda create-function-url-config \
     --function-name presign \
+    --auth-type NONE
+
+(cd lambdas/list; rm -f lambda.zip; zip lambda.zip handler.py)
+awslocal lambda create-function \
+    --function-name list \
+    --runtime python3.9 \
+    --timeout 10 \
+    --zip-file fileb://lambdas/list/lambda.zip \
+    --handler handler.handler \
+    --role arn:aws:iam::000000000000:role/lambda-role \
+    --environment Variables="{STAGE=local}"
+
+awslocal lambda create-function-url-config \
+    --function-name list \
     --auth-type NONE
 
 (
@@ -41,7 +56,8 @@ awslocal lambda create-function \
     --zip-file fileb://lambdas/resize/lambda.zip \
     --handler handler.handler \
     --dead-letter-config TargetArn=arn:aws:sns:us-east-1:000000000000:failed-resize-topic \
-    --role arn:aws:iam::000000000000:role/lambda-role
+    --role arn:aws:iam::000000000000:role/lambda-role \
+    --environment Variables="{STAGE=local}"
 
 awslocal s3api put-bucket-notification-configuration \
     --bucket localstack-thumbnails-app-images \

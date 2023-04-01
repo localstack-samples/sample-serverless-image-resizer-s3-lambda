@@ -1,4 +1,5 @@
 # adapted from https://docs.aws.amazon.com/lambda/latest/dg/with-s3-tutorial.html
+import os
 import typing
 import uuid
 from urllib.parse import unquote_plus
@@ -10,8 +11,15 @@ if typing.TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
     from mypy_boto3_ssm import SSMClient
 
-s3: "S3Client" = boto3.client("s3")
-ssm: "SSMClient" = boto3.client("ssm")
+MAX_DIMENSIONS = 400, 400
+"""The max width and height to scale the image to."""
+
+endpoint_url = None
+if os.getenv("STAGE") == "local":
+    endpoint_url = "https://localhost.localstack.cloud:4566"
+
+s3: "S3Client" = boto3.client("s3", endpoint_url=endpoint_url)
+ssm: "SSMClient" = boto3.client("ssm", endpoint_url=endpoint_url)
 
 
 def get_bucket_name() -> str:
@@ -21,7 +29,16 @@ def get_bucket_name() -> str:
 
 def resize_image(image_path, resized_path):
     with Image.open(image_path) as image:
-        image.thumbnail(tuple(int(x / 2) for x in image.size))
+        # Calculate the thumbnail size
+        width, height = image.size
+        max_width, max_height = MAX_DIMENSIONS
+        if width > max_width or height > max_height:
+            ratio = max(width / max_width, height / max_height)
+            width = int(width / ratio)
+            height = int(height / ratio)
+        size = width, height
+        # Generate the resized image
+        image.thumbnail(size)
         image.save(resized_path)
 
 
