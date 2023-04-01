@@ -20,7 +20,7 @@ Moreover, the repo includes a GitHub actions workflow to demonstrate how to run 
 Here's the app in action:
 
 
-https://user-images.githubusercontent.com/3996682/224579411-400e8ea5-1f61-4c34-84ae-9a21e760eff7.mp4
+https://user-images.githubusercontent.com/3996682/229314248-86122e9e-0150-4292-b889-401e6fb8f398.mp4
 
 
 ## Overview
