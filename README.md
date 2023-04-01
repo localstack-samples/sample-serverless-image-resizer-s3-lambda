@@ -25,7 +25,7 @@ https://user-images.githubusercontent.com/3996682/229314248-86122e9e-0150-4292-b
 
 ## Overview
 
-![Screenshot at 2022-11-23 16-34-12](https://user-images.githubusercontent.com/3996682/203586505-e54ccb3e-5101-4ee8-917d-d6372ee965ef.png)
+![Screenshot at 2023-04-02 01-32-56](https://user-images.githubusercontent.com/3996682/229322761-92f52eec-5bfb-412a-a3cb-8af4ee1fed24.png)
 
 ## Prerequisites
 
