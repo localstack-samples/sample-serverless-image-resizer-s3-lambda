@@ -4,6 +4,7 @@ Pillow==9.2.0
 mypy_boto3_ssm
 mypy_boto3_sns
 mypy_boto3_s3
+mypy_boto3_lambda
 black
 pytest
 awscli
