@@ -47,14 +47,8 @@ def test_s3_resize_integration():
 
     s3.upload_file(file, Bucket=source_bucket, Key=key)
 
-    # try for 15 seconds to wait for the resized image
-    for i in range(15):
-        try:
-            s3.head_object(Bucket=target_bucket, Key=key)
-            break
-        except:
-            pass
-        time.sleep(1)
+    # wait for the resized image to appear
+    s3.get_waiter("object_exists").wait(Bucket=target_bucket, Key=key)
 
     s3.head_object(Bucket=target_bucket, Key=key)
     s3.download_file(
