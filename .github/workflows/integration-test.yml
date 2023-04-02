@@ -30,8 +30,6 @@ jobs:
       - name: Start LocalStack
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          DNS_ADDRESS: 0
-          EDGE_PORT: 4566
         run: |
           pip install localstack awscli-local[ver1]
           docker pull localstack/localstack

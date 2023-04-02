@@ -4,11 +4,13 @@ import typing
 import uuid
 
 import boto3
+import pytest
 import requests
 
 if typing.TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
     from mypy_boto3_ssm import SSMClient
+    from mypy_boto3_lambda import LambdaClient
 
 os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 os.environ["AWS_ACCESS_KEY_ID"] = "test"
@@ -20,6 +22,17 @@ s3: "S3Client" = boto3.client(
 ssm: "SSMClient" = boto3.client(
     "ssm", endpoint_url="http://localhost.localstack.cloud:4566"
 )
+awslambda: "LambdaClient" = boto3.client(
+    "lambda", endpoint_url="http://localhost.localstack.cloud:4566"
+)
+
+
+@pytest.fixture(autouse=True)
+def _wait_for_lambdas():
+    # makes sure that the lambdas are available before running integration tests
+    awslambda.get_waiter("function_active").wait(FunctionName="presign")
+    awslambda.get_waiter("function_active").wait(FunctionName="resize")
+    awslambda.get_waiter("function_active").wait(FunctionName="list")
 
 
 def test_s3_resize_integration():
@@ -34,14 +47,8 @@ def test_s3_resize_integration():
 
     s3.upload_file(file, Bucket=source_bucket, Key=key)
 
-    # try for 15 seconds to wait for the resized image
-    for i in range(15):
-        try:
-            s3.head_object(Bucket=target_bucket, Key=key)
-            break
-        except:
-            pass
-        time.sleep(1)
+    # wait for the resized image to appear
+    s3.get_waiter("object_exists").wait(Bucket=target_bucket, Key=key)
 
     s3.head_object(Bucket=target_bucket, Key=key)
     s3.download_file(
