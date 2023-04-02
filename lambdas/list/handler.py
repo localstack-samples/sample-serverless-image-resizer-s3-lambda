@@ -30,6 +30,10 @@ def handler(event, context):
     images_bucket = get_bucket_name_images()
     images = s3.list_objects(Bucket=images_bucket)
 
+    if not images.get("Contents"):
+        print(f"Bucket {images_bucket} is empty")
+        return []
+
     result = {}
     # collect the original images
     for obj in images["Contents"]:
@@ -49,7 +53,7 @@ def handler(event, context):
     # collect the associated resized images
     resized_bucket = get_bucket_name_resized()
     images = s3.list_objects(Bucket=resized_bucket)
-    for obj in images["Contents"]:
+    for obj in images.get("Contents", []):
         if obj["Key"] not in result:
             continue
         result[obj["Key"]]["Resized"] = {
