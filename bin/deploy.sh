@@ -22,6 +22,8 @@ awslocal lambda create-function \
     --role arn:aws:iam::000000000000:role/lambda-role \
     --environment Variables="{STAGE=local}"
 
+awslocal lambda wait function-active-v2 --function-name presign
+
 awslocal lambda create-function-url-config \
     --function-name presign \
     --auth-type NONE
@@ -35,6 +37,8 @@ awslocal lambda create-function \
     --handler handler.handler \
     --role arn:aws:iam::000000000000:role/lambda-role \
     --environment Variables="{STAGE=local}"
+
+awslocal lambda wait function-active-v2 --function-name list
 
 awslocal lambda create-function-url-config \
     --function-name list \
@@ -58,6 +62,8 @@ awslocal lambda create-function \
     --dead-letter-config TargetArn=arn:aws:sns:us-east-1:000000000000:failed-resize-topic \
     --role arn:aws:iam::000000000000:role/lambda-role \
     --environment Variables="{STAGE=local}"
+
+awslocal lambda wait function-active-v2 --function-name resize
 
 awslocal s3api put-bucket-notification-configuration \
     --bucket localstack-thumbnails-app-images \
