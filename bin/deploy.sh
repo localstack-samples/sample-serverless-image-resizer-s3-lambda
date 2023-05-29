@@ -44,15 +44,27 @@ awslocal lambda create-function-url-config \
     --function-name list \
     --auth-type NONE
 
-(
-    cd lambdas/resize
-    rm -rf package lambda.zip
-    mkdir package
-    pip install -r requirements.txt -t package
-    zip lambda.zip handler.py
-    cd package
-    zip -r ../lambda.zip *;
-)
+os=$(uname -s)
+if [ "$os" == "Darwin" ]; then
+    (
+        cd lambda/resize
+        rm -rf package lambda.zip
+        docker build -t lambda-builder .
+        docker run --name lambda-container -v .:/output lambda-builder
+        docker cp lambda-container:/lambda.zip ./lambda.zip
+    )
+else
+    (
+        cd lambdas/resize
+        rm -rf package lambda.zip
+        mkdir package
+        pip install -r requirements.txt -t package
+        zip lambda.zip handler.py
+        cd package
+        zip -r ../lambda.zip *;
+    )
+fi 
+
 awslocal lambda create-function \
     --function-name resize \
     --runtime python3.9 \
