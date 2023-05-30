@@ -28,7 +28,7 @@ jobs:
 
       - name: Docker setup (macos only)
         id: setup-docker-mac
-        if: ${{ matrix.os == 'macos-latest' }}
+        if: ${{ runner.os == 'macOS' }}
         run: |
           brew install docker
           colima start
