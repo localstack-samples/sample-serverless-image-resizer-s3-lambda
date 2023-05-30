@@ -47,7 +47,7 @@ awslocal lambda create-function-url-config \
 os=$(uname -s)
 if [ "$os" == "Darwin" ]; then
     (
-        cd lambda/resize
+        cd lambdas/resize
         rm -rf package lambda.zip
         docker build -t lambda-builder .
         docker run --name lambda-container -v .:/output lambda-builder
