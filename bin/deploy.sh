@@ -22,6 +22,8 @@ awslocal lambda create-function \
     --role arn:aws:iam::000000000000:role/lambda-role \
     --environment Variables="{STAGE=local}"
 
+awslocal lambda wait function-active-v2 --function-name presign
+
 awslocal lambda create-function-url-config \
     --function-name presign \
     --auth-type NONE
@@ -36,19 +38,34 @@ awslocal lambda create-function \
     --role arn:aws:iam::000000000000:role/lambda-role \
     --environment Variables="{STAGE=local}"
 
+awslocal lambda wait function-active-v2 --function-name list
+
 awslocal lambda create-function-url-config \
     --function-name list \
     --auth-type NONE
 
-(
-    cd lambdas/resize
-    rm -rf package lambda.zip
-    mkdir package
-    pip install -r requirements.txt -t package
-    zip lambda.zip handler.py
-    cd package
-    zip -r ../lambda.zip *;
-)
+os=$(uname -s)
+if [ "$os" == "Darwin" ]; then
+    (
+        cd lambdas/resize
+        rm -rf libs lambda.zip
+        docker run --platform linux/x86_64 -v "$PWD":/var/task "public.ecr.aws/sam/build-python3.9" /bin/sh -c "pip install -r requirements.txt -t libs; exit"
+        cd libs && zip -r ../lambda.zip . && cd ..
+        zip lambda.zip handler.py
+        rm -rf libs
+    )
+else
+    (
+        cd lambdas/resize
+        rm -rf package lambda.zip
+        mkdir package
+        pip install -r requirements.txt -t package
+        zip lambda.zip handler.py
+        cd package
+        zip -r ../lambda.zip *;
+    )
+fi 
+
 awslocal lambda create-function \
     --function-name resize \
     --runtime python3.9 \
@@ -58,6 +75,8 @@ awslocal lambda create-function \
     --dead-letter-config TargetArn=arn:aws:sns:us-east-1:000000000000:failed-resize-topic \
     --role arn:aws:iam::000000000000:role/lambda-role \
     --environment Variables="{STAGE=local}"
+
+awslocal lambda wait function-active-v2 --function-name resize
 
 awslocal s3api put-bucket-notification-configuration \
     --bucket localstack-thumbnails-app-images \

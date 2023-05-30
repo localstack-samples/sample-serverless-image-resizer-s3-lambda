@@ -12,7 +12,10 @@ on:
 
 jobs:
   run-it-tests-job:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -22,6 +25,13 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
+      - name: Docker setup (macos only)
+        id: setup-docker-mac
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          brew install docker
+          colima start
 
       - name: Set up Project
         run: |
