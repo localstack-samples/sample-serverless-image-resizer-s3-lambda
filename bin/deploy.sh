@@ -48,10 +48,11 @@ os=$(uname -s)
 if [ "$os" == "Darwin" ]; then
     (
         cd lambdas/resize
-        rm -rf package lambda.zip
-        docker build -t lambda-builder .
-        docker run --name lambda-container -v .:/output lambda-builder
-        docker cp lambda-container:/lambda.zip ./lambda.zip
+        rm -rf libs lambda.zip
+        docker run --platform linux/x86_64 -v "$PWD":/var/task "public.ecr.aws/sam/build-python3.9" /bin/sh -c "pip install -r requirements.txt -t libs; exit"
+        cd libs && zip -r ../lambda.zip . && cd ..
+        zip lambda.zip handler.py
+        rm -rf libs
     )
 else
     (
