@@ -4,12 +4,12 @@ on:
       release-tag:
         type: string
         required: true
+        description: This will be the version of the release, but will also be used as 'tag' for the localstack docker image
   push:
     paths-ignore:
       - 'README.md'
     branches:
       - main
-      - cloudpod_workflow # TODO remove
             
 permissions:
   contents: write
@@ -17,7 +17,7 @@ permissions:
 name: Create Release
 jobs:
   release:
-    name: Create Pod
+    name: Create Release for Cloud Pod
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
