@@ -83,6 +83,7 @@ jobs:
           AWS_ACCESS_KEY_ID: test
           AWS_SECRET_ACCESS_KEY: test
         run: |
+          pip install -r requirements-dev.txt
           pytest tests
 
       - name: Show Logs
