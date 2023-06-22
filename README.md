@@ -1,6 +1,6 @@
 # Serverless image resizer
 
-[![LocalStack Pods Launchpad](https://localstack.cloud/gh/launch-pod-badge.svg)](https://app.localstack.cloud/launchpad?url=https://github.com/localstack/serverless-image-resizer/releases/download/v1.0.0/serverless-image-resizer-cloudpod-v1.0.0.zip)
+[![LocalStack Pods Launchpad](https://localstack.cloud/gh/launch-pod-badge.svg)](https://app.localstack.cloud/launchpad?url=https://github.com/localstack/sample-serverless-image-resizer-s3-lambda/releases/download/latest/release-pod.zip)
 
 | Key          | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 |--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -243,3 +243,23 @@ deploys the infrastructure to it, and then runs the integration tests.
 
 We appreciate your interest in contributing to our project and are always looking for new ways to improve the developer experience. We welcome feedback, bug reports, and even feature ideas from the community.
 Please refer to the [contributing file](CONTRIBUTING.md) for more details on how to get started. 
+
+## Cloud Pods
+
+[Cloud Pods](https://docs.localstack.cloud/user-guide/tools/cloud-pods/) are a mechanism that allows you to take a snapshot of the state in your current LocalStack instance, persist it to a storage backend, and easily share it with your team members.
+
+You can convert your current AWS infrastructure state to a Cloud Pod using the `localstack` CLI. 
+Check out our [Getting Started guide](https://docs.localstack.cloud/user-guide/tools/cloud-pods/getting-started/) and [LocalStack Cloud Pods CLI reference](https://docs.localstack.cloud/user-guide/tools/cloud-pods/pods-cli/) to learn more about Cloud Pods and how to use them.
+
+To inject a Cloud Pod you can use [Cloud Pods Launchpad](https://docs.localstack.cloud/user-guide/tools/cloud-pods/launchpad/) wich quickly injects Cloud Pods into your running LocalStack container. 
+
+Click here [![LocalStack Pods Launchpad](https://localstack.cloud/gh/launch-pod-badge.svg)](https://app.localstack.cloud/launchpad?url=https://github.com/localstack/sample-serverless-image-resizer-s3-lambda/releases/download/latest/release-pod.zip) to launch the Cloud Pods Launchpad and inject the Cloud Pod for this application by clicking the `Inject` button.
+
+
+Alternatively, you can inject the pod by using the `localstack` CLI. 
+First, you need to download the pod you want to inject from the [releases](https://github.com/localstack/sample-serverless-image-resizer-s3-lambda/releases).
+Then run:
+
+```sh
+localstack pod load file://$(pwd)/release-pod.zip
+```
