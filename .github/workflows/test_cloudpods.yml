@@ -57,27 +57,15 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Install Dependencies
-        run: |
-          pip install localstack awscli-local
-
       - name: Start LocalStack
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          LOCALSTACK_VOLUME_DIR: ${{ github.workspace }}/ls_test
-          MYSQL_FEATURE_FLAG: ${{ matrix.db }}
           DEBUG: 1 
           POD_LOAD_CLI_TIMEOUT: 300
         run: |
-          mkdir ls_test
-          ls -la ls_test
-          docker pull localstack/localstack-pro:${{ matrix.tag }}
+          pip install localstack awscli-local[ver1]
+          docker pull localstack/localstack
           # Start LocalStack in the background
-          if [ "mysql" ==  ${MYSQL_FEATURE_FLAG} ]; then
-            RDS_MYSQL_DOCKER=1 localstack start -d
-          else
-            localstack start -d
-          fi
+          localstack start -d
           # Wait 30 seconds for the LocalStack container to become ready before timing out
           echo "Waiting for LocalStack startup..."
           localstack wait -t 30
