@@ -35,9 +35,11 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Start LocalStack
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
         run: |
           pip install localstack awscli-local[ver1]
-          docker pull localstack/localstack:${{ inputs.release-tag || 'latest'}}
+          docker pull localstack/localstack-pro:${{ inputs.release-tag || 'latest'}}
           # Start LocalStack in the background
           localstack start -d
           # Wait 30 seconds for the LocalStack container to become ready before timing out
