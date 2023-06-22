@@ -61,9 +61,10 @@ jobs:
         env:
           DEBUG: 1 
           POD_LOAD_CLI_TIMEOUT: 300
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
         run: |
           pip install localstack awscli-local[ver1]
-          docker pull localstack/localstack
+          docker pull localstack/localstack-pro:${{ matrix.tag }}
           # Start LocalStack in the background
           localstack start -d
           # Wait 30 seconds for the LocalStack container to become ready before timing out
