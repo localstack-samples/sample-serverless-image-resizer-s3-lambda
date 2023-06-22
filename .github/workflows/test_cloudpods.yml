@@ -5,11 +5,7 @@ on:
     # “At 00:00 on Saturday.”
     - cron: "0 0 * * 6"
   workflow_dispatch:
-  push: # TODO remove just for testing
-    paths-ignore:
-      - 'README.md'
-    branches:
-      - cloudpod_workflow
+
 permissions:
   contents: write
 
