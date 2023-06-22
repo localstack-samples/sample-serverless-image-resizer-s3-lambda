@@ -48,7 +48,7 @@ jobs:
           # alternatively we can query the asset-id, and browser_download_url, but it seems like an overhead
           # asset_id=$(gh api repos/$GITHUB_REPOSITORY/releases/tags/latest | jq -r '.assets[]' | jq --arg DB $DB -c 'select(.name=="release-pod-\( $DB ).zip") | .id)
           # download_url=$(gh api repos/$GITHUB_REPOSITORY/releases/assets/$asset_id | jq -r ".browser_download_url")
-          download_url="https://github.com/$GITHUB_REPOSITORY/releases/download/${{ matrix.tag }}/release-pod-${{ matrix.db }}.zip"
+          download_url="https://github.com/$GITHUB_REPOSITORY/releases/download/${{ matrix.tag }}/release-pod.zip"
           curl -L $download_url --output release-pod.zip
           ls -la
 
