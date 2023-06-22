@@ -70,14 +70,6 @@ jobs:
     name: Upload Release Asset
     runs-on: ubuntu-latest
     steps:
-      - name: Download Pod Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: cloudpod
-
-      - name: Display structure of downloaded files
-        run: ls -R
-
       - name: Prepare Release Notes
         run: |
           echo "This release includes the Cloud Pod of the sample created with LocalStack Version \`${{ inputs.release-tag || 'latest'}}\`." > Release.txt
