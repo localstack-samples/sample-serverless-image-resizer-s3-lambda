@@ -24,7 +24,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        output=$(gh api repos/$GITHUB_REPOSITORY/releases |  jq -r '.[] | select(.tag_name|startswith("v")|not) | .tag_name')
+        output=$(gh api repos/$GITHUB_REPOSITORY/releases | jq -r '[.[] | select(.tag_name|startswith("v")|not) | .tag_name]')
         output=$(echo $output | tr '\n' ' ')
         echo "matrix=$output" >> $GITHUB_OUTPUT
   
