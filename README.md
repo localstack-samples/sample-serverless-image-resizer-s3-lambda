@@ -238,3 +238,8 @@ pytest tests/
 
 The demo LocalStack in CI, `.github/workflows/integration-test.yml` contains a GitHub Action that starts up LocalStack,
 deploys the infrastructure to it, and then runs the integration tests.
+
+## Contributing
+
+We appreciate your interest in contributing to our project and are always looking for new ways to improve the developer experience. We welcome feedback, bug reports, and even feature ideas from the community.
+Please refer to the [contributing file](CONTRIBUTING.md) for more details on how to get started. 
