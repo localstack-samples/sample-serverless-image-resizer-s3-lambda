@@ -1,0 +1,109 @@
+name: Test Released Cloud Pods
+
+on:
+  schedule:
+    # “At 00:00 on Saturday.”
+    - cron: "0 0 * * 6"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  get-releases:
+    name: Retrieve Released Cloud Pods
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+    - id: set-matrix
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        output=$(gh api repos/$GITHUB_REPOSITORY/releases | jq -r '[.[] | select(.tag_name|startswith("v")|not) | .tag_name]')
+        output=$(echo $output | tr '\n' ' ')
+        echo "matrix=$output" >> $GITHUB_OUTPUT
+  
+  test-pod-release:
+    needs: get-releases
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: 
+        tag: ${{ fromJson(needs.get-releases.outputs.matrix) }}
+    steps:
+      # checkout to run the tests later on
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Retrieve Pod
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # TODO the download url seems to follow the pattern $GITHUB_REPOSITORY/releases/download/{TAG}/{ASSET_NAME}
+          # alternatively we can query the asset-id, and browser_download_url, but it seems like an overhead
+          # asset_id=$(gh api repos/$GITHUB_REPOSITORY/releases/tags/latest | jq -r '.assets[]' | jq --arg DB $DB -c 'select(.name=="release-pod-\( $DB ).zip") | .id)
+          # download_url=$(gh api repos/$GITHUB_REPOSITORY/releases/assets/$asset_id | jq -r ".browser_download_url")
+          download_url="https://github.com/$GITHUB_REPOSITORY/releases/download/${{ matrix.tag }}/release-pod.zip"
+          curl -L $download_url --output release-pod.zip
+          ls -la
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Start LocalStack
+        env:
+          DEBUG: 1 
+          POD_LOAD_CLI_TIMEOUT: 300
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+        run: |
+          pip install localstack awscli-local[ver1]
+          docker pull localstack/localstack-pro:${{ matrix.tag }}
+          # Start LocalStack in the background
+          localstack start -d
+          # Wait 30 seconds for the LocalStack container to become ready before timing out
+          echo "Waiting for LocalStack startup..."
+          localstack wait -t 30
+          echo "Startup complete"
+
+      - name: Inject Pod
+        run: |
+          localstack pod load file://release-pod.zip
+
+      - name: Run Tests
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+        run: |
+          pip install -r requirements-dev.txt
+          pytest tests
+
+      - name: Show Logs
+        if: failure()
+        run: |
+          localstack logs
+
+      - name: Send a Slack notification
+        if: failure() || github.event_name != 'pull_request'
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          notification_title: "{workflow} has {status_message}"
+          message_format: "{emoji} *{workflow}* {status_message} in <{repo_url}|{repo}>"
+          footer: "Linked Repo <{repo_url}|{repo}> | <{run_url}|View Workflow run>"
+          notify_when: "failure"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Prevent Workflows from getting Stale
+        if: always()
+        uses: gautamkrishnar/keepalive-workflow@v1
+        with:
+          # this message should prevent automatic triggering of workflows
+          # see https://docs.github.com/en/actions/managing-workflow-runs/skipping-workflow-runs
+          commit_message: "[skip ci] Automated commit by Keepalive Workflow to keep the repository active"
