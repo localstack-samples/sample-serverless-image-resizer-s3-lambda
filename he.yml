@@ -1,0 +1,35 @@
+version: "0.1"
+runson: linux
+autosplit: true
+parallelism: 2
+concurrency: 2
+maxRetries: 1
+testSuiteTimeout: 480
+globalTimeout: 480
+
+cacheKey: '{{ checksum "requirements-dev.txt" }}'
+cacheDirectories:
+  - CacheDir
+
+pre:
+  - mkdir CacheDir
+  - pip3 install -r requirements-dev.txt --cache-dir CacheDir
+  - python3 -m pip install localstack
+  - LOCALSTACK_API_KEY=${{ .secrets.LOCALSTACK_API_KEY }} localstack start -d
+  - localstack wait -t 60
+
+testDiscovery:
+  type: raw
+  mode: dynamic
+  command: pytest --co -q
+
+testRunnerCommand: pytest $test
+
+sourcePayload:
+  platform: git
+  link: https://github.com/macnev2013/sample-serverless-image-resizer-s3-lambda
+  ref: feat/he
+  accessToken: ${{ .secrets.PAT }}
+
+testSuites:
+  - python3 $files

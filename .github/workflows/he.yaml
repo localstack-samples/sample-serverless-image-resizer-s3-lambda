@@ -1,0 +1,14 @@
+name: HyperExecute
+on:
+  push:
+    branches:
+      - he
+jobs:
+  HE:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          wget https://downloads.lambdatest.com/hyperexecute/linux/hyperexecute
+          chmod +x hyperexecute
+          ./hyperexecute --user nevil.macwan --key ${{ secrets.HE }} --config he.yaml
