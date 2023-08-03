@@ -7,16 +7,13 @@ maxRetries: 1
 testSuiteTimeout: 480
 globalTimeout: 480
 
-cacheKey: '{{ checksum "requirements-dev.txt" }}'
-cacheDirectories:
-  - CacheDir
-
 pre:
-  - mkdir CacheDir
-  - pip3 install -r requirements-dev.txt --cache-dir CacheDir
-  - python3 -m pip install localstack
-  - LOCALSTACK_API_KEY=${{ .secrets.LOCALSTACK_API_KEY }} localstack start -d
-  - localstack wait -t 60
+  - pip3 install -r requirements-dev.txt
+  # - python3 -m pip install localstack
+  # - LOCALSTACK_API_KEY=${{ .secrets.LOCALSTACK_API_KEY }} localstack start -d
+  # - localstack wait -t 60
+  - LOCALSTACK_API_KEY=${{ .secrets.LOCALSTACK_API_KEY }} /home/ltuser/.pyenv/shims/localstack start -d
+  - /home/ltuser/.pyenv/shims/localstack wait -t 60
 
 testDiscovery:
   type: raw
@@ -30,6 +27,3 @@ sourcePayload:
   link: https://github.com/macnev2013/sample-serverless-image-resizer-s3-lambda
   ref: feat/he
   accessToken: ${{ .secrets.PAT }}
-
-testSuites:
-  - python3 $files
