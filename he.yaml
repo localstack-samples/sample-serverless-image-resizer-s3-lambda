@@ -8,7 +8,7 @@ testSuiteTimeout: 480
 globalTimeout: 480
 
 pre:
-  - pip3 install -r requirements-dev.txt
+  - /home/ltuser/.pyenv/shims/python -m pip install -r  requirements-dev.txt
   # - python3 -m pip install localstack
   # - LOCALSTACK_API_KEY=${{ .secrets.LOCALSTACK_API_KEY }} localstack start -d
   # - localstack wait -t 60
