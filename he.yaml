@@ -18,9 +18,9 @@ pre:
 testDiscovery:
   type: raw
   mode: dynamic
-  command: pytest --co -q
+  command: /home/ltuser/.pyenv/shims/pytest --co -q
 
-testRunnerCommand: pytest $test
+testRunnerCommand: /home/ltuser/.pyenv/shims/pytest $test
 
 sourcePayload:
   platform: git
