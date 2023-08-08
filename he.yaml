@@ -20,7 +20,7 @@ testDiscovery:
   mode: dynamic
   command: /home/ltuser/.pyenv/shims/python -m pytest --co -q
 
-testRunnerCommand: /home/ltuser/.pyenv/shims/python -m pytest $test; localstack logs
+testRunnerCommand: /home/ltuser/.pyenv/shims/python -m pytest $test; /home/ltuser/.pyenv/shims/localstack logs
 
 sourcePayload:
   platform: git
