@@ -15,15 +15,12 @@ pre:
   - LOCALSTACK_API_KEY=${{ .secrets.LOCALSTACK_API_KEY }} /home/ltuser/.pyenv/shims/localstack start -d
   - /home/ltuser/.pyenv/shims/localstack wait -t 60
 
-post:
-  - /home/ltuser/.pyenv/shims/localstack logs
-
 testDiscovery:
   type: raw
   mode: dynamic
   command: /home/ltuser/.pyenv/shims/python -m pytest --co -q
 
-testRunnerCommand: /home/ltuser/.pyenv/shims/python -m pytest $test
+testRunnerCommand: /home/ltuser/.pyenv/shims/python -m pytest $test; localstack logs
 
 sourcePayload:
   platform: git
