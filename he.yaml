@@ -20,7 +20,7 @@ pre:
 testDiscovery:
   type: raw
   mode: dynamic
-  command: pytest --co -q tests | tail -r | tail -n +2 | tail -r
+  command: pytest --co -q tests | sed '$d'
 
 testRunnerCommand: pytest $test
 
