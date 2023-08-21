@@ -7,38 +7,22 @@ maxRetries: 1
 testSuiteTimeout: 480
 globalTimeout: 480
 
+runtime:
+  language: python
+  version: 3.9.16
+
 pre:
-  - /home/ltuser/.pyenv/shims/python -m pip install -r  requirements-dev.txt
-  # - python3 -m pip install localstack
-  # - LOCALSTACK_API_KEY=${{ .secrets.LOCALSTACK_API_KEY }} localstack start -d
-  # - localstack wait -t 60
-  - LOCALSTACK_API_KEY=${{ .secrets.LOCALSTACK_API_KEY }} /home/ltuser/.pyenv/shims/localstack start -d
-  - /home/ltuser/.pyenv/shims/localstack wait -t 60
-  - /home/ltuser/.pyenv/shims/python -m awslocal s3 mb s3://localstack-thumbnails-app-images
-  - /home/ltuser/.pyenv/shims/python -m awslocal s3 mb s3://localstack-thumbnails-app-resized
-  - /home/ltuser/.pyenv/shims/python -m awslocal ssm put-parameter --name /localstack-thumbnail-app/buckets/images --type "String" --value "localstack-thumbnails-app-images"
-  - /home/ltuser/.pyenv/shims/python -m awslocal ssm put-parameter --name /localstack-thumbnail-app/buckets/resized --type "String" --value "localstack-thumbnails-app-resized"
-  - /home/ltuser/.pyenv/shims/python -m awslocal sns create-topic --name failed-resize-topic
-  - /home/ltuser/.pyenv/shims/python -m awslocal sns subscribe --topic-arn arn:aws:sns:us-east-1:000000000000:failed-resize-topic --protocol email --notification-endpoint my-email@example.com
-  - (cd lambdas/presign; rm -f lambda.zip; zip lambda.zip handler.py)
-  - /home/ltuser/.pyenv/shims/python -m awslocal lambda create-function --function-name presign --runtime python3.9 --timeout 10 --zip-file fileb://lambdas/presign/lambda.zip --handler handler.handler --role arn:aws:iam::000000000000:role/lambda-role --environment Variables="{STAGE=local}"
-  - /home/ltuser/.pyenv/shims/python -m awslocal lambda create-function-url-config --function-name presign --auth-type NONE
-  - (cd lambdas/list; rm -f lambda.zip; zip lambda.zip handler.py)
-  - /home/ltuser/.pyenv/shims/python -m awslocal lambda create-function --function-name list --handler handler.handler --zip-file fileb://lambdas/list/lambda.zip --runtime python3.9 --role arn:aws:iam::000000000000:role/lambda-role --environment Variables="{STAGE=local}" 
-  - /home/ltuser/.pyenv/shims/python -m awslocal lambda create-function-url-config --function-name list --auth-type NONE
-  - (cd lambdas/resize; rm -rf package lambda.zip; mkdir package; /home/ltuser/.pyenv/shims/python -m pip install -r requirements.txt -t package; zip lambda.zip handler.py; cd package; zip -r ../lambda.zip *)
-  - /home/ltuser/.pyenv/shims/python -m awslocal lambda create-function --function-name resize --runtime python3.9 --timeout 10 --zip-file fileb://lambdas/resize/lambda.zip --handler handler.handler --dead-letter-config TargetArn=arn:aws:sns:us-east-1:000000000000:failed-resize-topic --role arn:aws:iam::000000000000:role/lambda-role --environment Variables="{STAGE=local}"
-  - /home/ltuser/.pyenv/shims/python -m awslocal s3api put-bucket-notification-configuration --bucket localstack-thumbnails-app-images --notification-configuration "{"\LambdaFunctionConfigurations\": [{\"LambdaFunctionArn\": \"$(/home/ltuser/.pyenv/shims/python -m awslocal lambda get-function --function-name resize | jq -r .Configuration.FunctionArn)\", \"Events\": [\"s3:ObjectCreated:*\"]}]}"
-  - /home/ltuser/.pyenv/shims/python -m awslocal s3 mb s3://webapp
-  - /home/ltuser/.pyenv/shims/python -m awslocal s3 sync --delete ./website s3://webapp
-  - /home/ltuser/.pyenv/shims/python -m awslocal s3 website s3://webapp --index-document index.html
+  - pip install -r  requirements-dev.txt
+  - LOCALSTACK_API_KEY=${{ .secrets.LOCALSTACK_API_KEY }} localstack start -d
+  - localstack wait -t 60
+  - bin/deploy.sh
 
 testDiscovery:
   type: raw
   mode: dynamic
-  command: /home/ltuser/.pyenv/shims/python -m pytest --co -q | sed -e '1,3d;$d'
+  command: pytest --co -q tests | tail -r | tail -n +2 | tail -r
 
-testRunnerCommand: /home/ltuser/.pyenv/shims/python -m pytest $test; /home/ltuser/.pyenv/shims/localstack logs
+testRunnerCommand: pytest $test
 
 sourcePayload:
   platform: git
