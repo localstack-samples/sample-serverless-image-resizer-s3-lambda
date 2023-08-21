@@ -6,6 +6,7 @@ concurrency: 2
 maxRetries: 1
 testSuiteTimeout: 480
 globalTimeout: 480
+scenarioCommandStatusOnly: true
 
 runtime:
   language: python
