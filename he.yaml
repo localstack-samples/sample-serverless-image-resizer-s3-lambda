@@ -28,5 +28,5 @@ testRunnerCommand: pytest $test
 sourcePayload:
   platform: git
   link: https://github.com/macnev2013/sample-serverless-image-resizer-s3-lambda
-  ref: he
+  ref: main
   accessToken: ${{ .secrets.PAT }}
