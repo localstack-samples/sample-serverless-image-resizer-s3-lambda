@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export AWS_DEFAULT_REGION=us-east-1
+
 awslocal s3 mb s3://localstack-thumbnails-app-images
 awslocal s3 mb s3://localstack-thumbnails-app-resized
 
@@ -85,3 +87,11 @@ awslocal s3api put-bucket-notification-configuration \
 awslocal s3 mb s3://webapp
 awslocal s3 sync --delete ./website s3://webapp
 awslocal s3 website s3://webapp --index-document index.html
+
+echo
+echo "Fetching function URL for 'presign' Lambda..."
+awslocal lambda list-function-url-configs --function-name presign | jq -r '.FunctionUrlConfigs[0].FunctionUrl'
+echo "Fetching function URL for 'list' Lambda..."
+awslocal lambda list-function-url-configs --function-name list | jq -r '.FunctionUrlConfigs[0].FunctionUrl'
+
+echo "Now open the Web app under https://webapp.s3.localhost.localstack.cloud/index.html and paste the function URLs above (make sure to use https:// as protocol)"
