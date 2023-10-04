@@ -12,7 +12,7 @@
 
     let imageItemTemplate = Handlebars.compile($("#image-item-template").html());
 
-    $("#configForm").submit(function (event) {
+    $("#configForm").submit(async function (event) {
         if (event.preventDefault)
             event.preventDefault();
         else
@@ -22,7 +22,23 @@
 
         let action = $(this).find("button[type=submit]:focus").attr('name');
 
-        if (action == "save") {
+        if (action == "load") {
+            let baseUrl = `${document.location.protocol}//${document.location.host}`;
+            if (baseUrl.indexOf("file://") >= 0) {
+                baseUrl = `http://localhost:4566`;
+            }
+            const headers = {authorization: "AWS4-HMAC-SHA256 Credential=test/20231004/us-east-1/lambda/aws4_request, ..."};
+            const loadUrl = async (funcName, resultElement) => {
+                const url = `${baseUrl}/2021-10-31/functions/${funcName}/urls`;
+                const result = await $.ajax({url, headers}).promise();
+                const funcUrl = JSON.parse(result).FunctionUrlConfigs[0].FunctionUrl;
+                $(`#${resultElement}`).val(funcUrl);
+                localStorage.setItem(resultElement, funcUrl);
+            }
+            await loadUrl("presign", "functionUrlPresign");
+            await loadUrl("list", "functionUrlList");
+            alert("Function URL configurations loaded");
+        } else if (action == "save") {
             localStorage.setItem("functionUrlPresign", $("#functionUrlPresign").val());
             localStorage.setItem("functionUrlList", $("#functionUrlList").val());
             alert("Configuration saved");

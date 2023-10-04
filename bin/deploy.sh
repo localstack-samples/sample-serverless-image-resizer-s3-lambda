@@ -66,7 +66,7 @@ else
         cd package
         zip -r ../lambda.zip *;
     )
-fi 
+fi
 
 awslocal lambda create-function \
     --function-name resize \
