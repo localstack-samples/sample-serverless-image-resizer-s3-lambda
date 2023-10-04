@@ -27,6 +27,7 @@
             if (baseUrl.indexOf("file://") >= 0) {
                 baseUrl = `http://localhost:4566`;
             }
+            baseUrl = baseUrl.replace("://webapp.s3.", "://");
             const headers = {authorization: "AWS4-HMAC-SHA256 Credential=test/20231004/us-east-1/lambda/aws4_request, ..."};
             const loadUrl = async (funcName, resultElement) => {
                 const url = `${baseUrl}/2021-10-31/functions/${funcName}/urls`;
