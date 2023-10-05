@@ -10,6 +10,7 @@
         crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
         rel="stylesheet">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 </head>
 <body>
 
@@ -43,6 +44,7 @@
             <input type="text" class="form-control" id="functionUrlList" autocomplete="false"/>
           </div>
           <div class="mb-3">
+            <button type="submit" name="load" class="btn btn-primary mb-3">Load from API</button>
             <button type="submit" name="save" class="btn btn-primary mb-3">Apply</button>
             <button type="submit" name="clear" class="btn btn-secondary mb-3">Clear</button>
           </div>
@@ -65,7 +67,8 @@
           and then forwards the POST request directly to S3.
           Resizing the image to max 400x400 pixels happens asynchronously through S3 bucket notifications.
           If the resizing of an image fails, then an SNS message will be sent, which will trigger an SES email
-          notification. You can find those by visiting <a href="//localhost.localstack.cloud:4566/_aws/ses">http://localhost.localstack.cloud:4566/_aws/ses</a>
+          notification. You can find those by visiting
+          <a href="//localhost.localstack.cloud:4566/_aws/ses">http://localhost.localstack.cloud:4566/_aws/ses</a>
         </p>
         <form id="uploadForm" action="#" method="post">
           <div class="mb-3">
@@ -98,7 +101,7 @@
     <p class="mt-2">
         The images you uploaded should be shown here.
         When the refresh action is triggered, the browser makes a request to the <code>list</code> Lambda URL
-        which returns a JSON document of all items in the images and the resized images bucket. The Javascript
+        which returns a JSON document of all items in the images and the resized images bucket. The JavaScript
         then populates the list below using a Handlebars template.
       </p>
     <hr>
