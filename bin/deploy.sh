@@ -79,6 +79,7 @@ awslocal lambda create-function \
     --environment Variables="{STAGE=local}"
 
 awslocal lambda wait function-active-v2 --function-name resize
+awslocal lambda put-function-event-invoke-config --function-name resize --maximum-event-age-in-seconds 3600 --maximum-retry-attempts 0
 
 awslocal s3api put-bucket-notification-configuration \
     --bucket localstack-thumbnails-app-images \
