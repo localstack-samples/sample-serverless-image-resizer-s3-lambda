@@ -60,6 +60,8 @@ jobs:
           pytest tests
       
       - name: Save the Cloud Pod 
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
         uses: HarshCasper/cloud-pod-save@v0.1.0
         with:
           name: 'release-pod.zip'

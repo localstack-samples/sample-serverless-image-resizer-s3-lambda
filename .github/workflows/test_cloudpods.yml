@@ -69,6 +69,8 @@ jobs:
           echo "Startup complete"
 
       - name: Inject Pod
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
         run: |
           localstack pod load file://release-pod.zip
 
