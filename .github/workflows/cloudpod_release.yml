@@ -60,15 +60,15 @@ jobs:
           pytest tests
       
       - name: Save the Cloud Pod 
-        uses: HarshCasper/cloud-pod-save@v0.1.0
-        with:
-          name: 'release-pod.zip'
-          location: 'disk'
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+        run: | 
+          localstack state export release-pod.zip
 
       - name: Prepare Release Notes
         run: |
           echo "This release includes the Cloud Pod of the sample created with LocalStack Version \`${{ inputs.release-tag || 'latest'}}\`." > Release.txt
-          echo "You can download the \`release-pod.zip\` and inject it manually by running \`localstack pod load file://release-pod.zip\`, or use the Cloud Pods Launchpad." >> Release.txt
+          echo "You can download the \`release-pod.zip\` and inject it manually by running \`localstack state import release-pod.zip\`, or use the Cloud Pods Launchpad." >> Release.txt
           echo "### Cloud Pods Launchpad" >> Release.txt
           echo "You can click the Launchpad to inject the the pod into your running LocalStack instance using the WebUI:" >> Release.txt
           echo "[![LocalStack Pods Launchpad](https://localstack.cloud/gh/launch-pod-badge.svg)](https://app.localstack.cloud/launchpad?url=https://github.com/$GITHUB_REPOSITORY/releases/download/${{ inputs.release-tag || 'latest'}}/release-pod.zip)" >> Release.txt
