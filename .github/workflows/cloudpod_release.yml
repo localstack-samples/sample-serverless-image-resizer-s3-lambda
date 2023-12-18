@@ -62,10 +62,8 @@ jobs:
       - name: Save the Cloud Pod 
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-        uses: HarshCasper/cloud-pod-save@v0.1.0
-        with:
-          name: 'release-pod.zip'
-          location: 'disk'
+        run: | 
+          localstack state export release-pod.zip
 
       - name: Prepare Release Notes
         run: |
