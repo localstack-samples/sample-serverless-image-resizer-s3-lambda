@@ -249,9 +249,9 @@ Please refer to the [contributing file](CONTRIBUTING.md) for more details on how
 [Cloud Pods](https://docs.localstack.cloud/user-guide/tools/cloud-pods/) are a mechanism that allows you to take a snapshot of the state in your current LocalStack instance, persist it to a storage backend, and easily share it with your team members.
 
 You can convert your current AWS infrastructure state to a Cloud Pod using the `localstack` CLI. 
-Check out our [Getting Started guide](https://docs.localstack.cloud/user-guide/tools/cloud-pods/getting-started/) and [LocalStack Cloud Pods CLI reference](https://docs.localstack.cloud/user-guide/tools/cloud-pods/pods-cli/) to learn more about Cloud Pods and how to use them.
+Check out our [Getting Started guide](https://docs.localstack.cloud/user-guide/cloud-pods/getting-started/) and [LocalStack Cloud Pods CLI reference](https://docs.localstack.cloud/user-guide/cloud-pods/pods-cli/ to learn more about Cloud Pods and how to use them.
 
-To inject a Cloud Pod you can use [Cloud Pods Launchpad](https://docs.localstack.cloud/user-guide/tools/cloud-pods/launchpad/) wich quickly injects Cloud Pods into your running LocalStack container. 
+To inject a Cloud Pod you can use [Cloud Pods Launchpad](https://docs.localstack.cloud/user-guide/cloud-pods/launchpad/) wich quickly injects Cloud Pods into your running LocalStack container. 
 
 Click here [![LocalStack Pods Launchpad](https://localstack.cloud/gh/launch-pod-badge.svg)](https://app.localstack.cloud/launchpad?url=https://github.com/localstack/sample-serverless-image-resizer-s3-lambda/releases/download/latest/release-pod.zip) to launch the Cloud Pods Launchpad and inject the Cloud Pod for this application by clicking the `Inject` button.
 
@@ -261,5 +261,5 @@ First, you need to download the pod you want to inject from the [releases](https
 Then run:
 
 ```sh
-localstack pod load file://$(pwd)/release-pod.zip
+localstack state import /path/to/release-pod.zip
 ```
