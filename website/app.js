@@ -19,15 +19,19 @@
             event.returnValue = false;
 
         event.preventDefault();
-
         let action = $(this).find("button[type=submit]:focus").attr('name');
+        if (action === undefined) {
+            // the jquery find with the focus does not work on Safari, maybe because the focus is not instantly given
+            // fallback to manually retrieving the submitter from the original event
+            action = event.originalEvent.submitter.getAttribute('name')
+        }
 
         if (action == "load") {
             let baseUrl = `${document.location.protocol}//${document.location.host}`;
             if (baseUrl.indexOf("file://") >= 0) {
                 baseUrl = `http://localhost:4566`;
             }
-            baseUrl = baseUrl.replace("://webapp.s3.", "://");
+            baseUrl = baseUrl.replace("://webapp.s3.", "://").replace("://webapp.s3-website.", "://");
             const headers = {authorization: "AWS4-HMAC-SHA256 Credential=test/20231004/us-east-1/lambda/aws4_request, ..."};
             const loadUrl = async (funcName, resultElement) => {
                 const url = `${baseUrl}/2021-10-31/functions/${funcName}/urls`;
