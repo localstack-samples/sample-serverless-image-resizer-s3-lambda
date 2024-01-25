@@ -169,7 +169,7 @@ awslocal lambda create-function-url-config \
     cd lambdas/resize
     rm -rf package lambda.zip
     mkdir package
-    pip install -r requirements.txt -t package
+    pip install -r requirements.txt -t package --platform manylinux2014_x86_64 --only-binary=:all:
     zip lambda.zip handler.py
     cd package
     zip -r ../lambda.zip *;
