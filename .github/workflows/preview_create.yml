@@ -20,6 +20,10 @@ jobs:
         with:
           python-version: 3.9
 
+      - name: Install dependencies
+        run: |
+          pip install awscli-local
+
       - name: Deploy Preview
         uses: LocalStack/setup-localstack/preview@main
         env:
@@ -35,4 +39,4 @@ jobs:
             # Below is an example for the Image resizer application.
             bin/deploy.sh
 
-            echo "Open URL: https://webapp.s3-website.${AWS_ENDPOINT_URL}:4566"
+            echo "Open URL: ${AWS_ENDPOINT_URL}:4566"
