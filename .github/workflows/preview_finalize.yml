@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - name: Finalize PR comment
         uses: LocalStack/setup-localstack/finish@main
