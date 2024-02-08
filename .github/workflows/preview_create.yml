@@ -1,0 +1,36 @@
+name: Create PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.9
+        id: setup-python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Deploy Preview
+        uses: LocalStack/setup-localstack/preview@main
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}
+          preview-cmd: |
+            # Add your custom deployment commands here. 
+            # Below is an example for the Image resizer application.
+            bin/deploy.sh
+
+            echo "Open URL: https://webapp.s3-website.${AWS_ENDPOINT_URL}:4566"
