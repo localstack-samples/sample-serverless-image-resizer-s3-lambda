@@ -38,5 +38,3 @@ jobs:
             # Add your custom deployment commands here. 
             # Below is an example for the Image resizer application.
             bin/deploy.sh
-
-            echo "Open URL: ${AWS_ENDPOINT_URL}:4566"
