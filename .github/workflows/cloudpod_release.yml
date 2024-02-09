@@ -34,17 +34,13 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Start LocalStack
+        uses: LocalStack/setup-localstack@v0.1.3
+        with:
+          image-tag: ${{ inputs.release-tag || 'latest'}}
+          use-pro: 'true'
+          install-awslocal: 'true'
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-        run: |
-          pip install localstack awscli-local[ver1]
-          docker pull localstack/localstack-pro:${{ inputs.release-tag || 'latest'}}
-          # Start LocalStack in the background
-          localstack start -d
-          # Wait 30 seconds for the LocalStack container to become ready before timing out
-          echo "Waiting for LocalStack startup..."
-          localstack wait -t 30
-          echo "Startup complete"
 
       - name: Deploy infrastructure
         run: |
