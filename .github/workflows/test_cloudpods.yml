@@ -54,7 +54,7 @@ jobs:
           python-version: '3.9'
 
       - name: Start LocalStack
-        uses: LocalStack/setup-localstack@v0.1.3
+        uses: LocalStack/setup-localstack@main
         with:
           image-tag: ${{ matrix.tag }}
           use-pro: 'true'
