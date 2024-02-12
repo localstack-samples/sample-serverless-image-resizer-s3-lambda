@@ -60,6 +60,8 @@ jobs:
           use-pro: 'true'
           install-awslocal: 'true'
         env:
+          DEBUG: 1
+          POD_LOAD_CLI_TIMEOUT: 300
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
 
       - name: Inject Pod
