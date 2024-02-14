@@ -1,0 +1,37 @@
+image: docker:20.10.21
+
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  variables:
+    AWS_ACCESS_KEY_ID: test
+    AWS_SECRET_ACCESS_KEY: test
+    AWS_DEFAULT_REGION: us-east-1
+    AWS_REGION: us-east-1
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    AWS_ENDPOINT_URL: http://localhost.localstack.cloud:4566
+
+  services:
+    - name: docker:20.10.21-dind-alpine3.17
+      alias: docker
+      command: ["--tls=false"]
+
+  before_script:
+    - apk update
+    - apk add gcc musl-dev linux-headers py3-pip python3 python3-dev curl
+    - curl https://pyenv.run | bash
+    - pyenv install 3.9.16
+    - pyenv global 3.9.16
+    - python -m venv .venv
+    - source .venv/bin/activate
+    - pip install localstack
+    - pip install -r requirements-dev.txt
+    - docker pull localstack/localstack:latest
+    - dind_ip="$(getent hosts docker | cut -d' ' -f1)"
+    - echo "${dind_ip} localhost.localstack.cloud " >> /etc/hosts
+  script:
+    - DOCKER_HOST="tcp://${dind_ip}:2375" localstack start -d
+    # - bin/deploy.sh
