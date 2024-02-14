@@ -24,6 +24,7 @@ variables:
 
 default:
   before_script:
+    - apt-get update && apt-get install -y zip
     - pip install -r requirements-dev.txt
 
 deploy:
