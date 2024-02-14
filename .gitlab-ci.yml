@@ -13,6 +13,7 @@ services:
     variables:
       DOCKER_HOST: tcp://docker:2375
       DOCKER_TLS_CERTDIR: ""
+      DOCKER_SOCK: tcp://docker:2375
 
 variables:
   AWS_ACCESS_KEY_ID: test
