@@ -21,7 +21,7 @@ deploy:
 
   before_script:
     - apk update
-    - apk add gcc musl-dev linux-headers py3-pip python3 python3-dev curl bash
+    - apk add gcc musl-dev linux-headers py3-pip python3 python3-dev bash curl git
     - curl https://pyenv.run | bash
     - pyenv install 3.9.16
     - pyenv global 3.9.16
