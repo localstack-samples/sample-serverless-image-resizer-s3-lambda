@@ -9,7 +9,7 @@ services:
     alias: docker
     command: ["--tls=false"]
   - name: localstack/localstack:latest
-    alias: localstack
+    alias: localhost.localstack.cloud
     variables:
       DOCKER_HOST: tcp://docker:2375
       DOCKER_TLS_CERTDIR: ""
@@ -20,7 +20,7 @@ variables:
   AWS_SECRET_ACCESS_KEY: test
   AWS_DEFAULT_REGION: us-east-1
   AWS_REGION: us-east-1
-  AWS_ENDPOINT_URL: http://localstack:4566
+  AWS_ENDPOINT_URL: http://localhost.localstack.cloud:4566
   CI_DEBUG_SERVICES: "true"
 
 default:
