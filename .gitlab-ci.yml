@@ -1,7 +1,6 @@
 image: "python:3.9.16"
 
 stages:
-  - deploy
   - test
 
 variables:
@@ -27,12 +26,8 @@ default:
     - apt-get update && apt-get install -y zip jq
     - pip install -r requirements-dev.txt
 
-deploy:
-  stage: deploy
-  script:
-    - ./bin/deploy.sh
-
 test:
   stage: test
   script:
+    - ./bin/deploy.sh
     - pytest tests
