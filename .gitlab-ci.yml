@@ -13,7 +13,7 @@ services:
     variables:
       DOCKER_HOST: tcp://docker:2375
       DOCKER_TLS_CERTDIR: ""
-      DOCKER_SOCK: tcp://docker:2375
+      DOCKER_TLS_VERIFY: "false"
 
 variables:
   AWS_ACCESS_KEY_ID: test
@@ -33,8 +33,7 @@ deploy:
   script:
     - ./bin/deploy.sh
 
-# test:
-#   stage: test
-
-#   script:
-#     - ./bin/deploy.sh
+test:
+  stage: test
+  script:
+    - pytest tests
