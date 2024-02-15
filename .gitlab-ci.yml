@@ -4,17 +4,6 @@ stages:
   - deploy
   - test
 
-services:
-  - name: docker:20.10.21-dind-alpine3.17
-    alias: docker
-    command: ["--tls=false"]
-  - name: localstack/localstack:latest
-    alias: localhost.localstack.cloud
-    variables:
-      DOCKER_HOST: tcp://docker:2375
-      DOCKER_TLS_CERTDIR: ""
-      DOCKER_TLS_VERIFY: "false"
-
 variables:
   AWS_ACCESS_KEY_ID: test
   AWS_SECRET_ACCESS_KEY: test
@@ -24,6 +13,16 @@ variables:
   CI_DEBUG_SERVICES: "true"
 
 default:
+  services:
+    - name: docker:20.10.21-dind-alpine3.17
+      alias: docker
+      command: ["--tls=false"]
+    - name: localstack/localstack:latest
+      alias: localhost.localstack.cloud
+      variables:
+        DOCKER_HOST: tcp://docker:2375
+        DOCKER_TLS_CERTDIR: ""
+        DOCKER_TLS_VERIFY: "false"
   before_script:
     - apt-get update && apt-get install -y zip jq
     - pip install -r requirements-dev.txt
