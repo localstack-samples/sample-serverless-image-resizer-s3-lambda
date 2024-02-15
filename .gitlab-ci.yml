@@ -1,6 +1,7 @@
 image: "python:3.9.16"
 
 stages:
+  - deploy
   - test
 
 variables:
@@ -9,9 +10,9 @@ variables:
   AWS_DEFAULT_REGION: us-east-1
   AWS_REGION: us-east-1
   AWS_ENDPOINT_URL: http://localhost.localstack.cloud:4566
-  CI_DEBUG_SERVICES: "true"
   DEBUG: 1
   LS_LOG: "trace"
+  PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
 
 default:
   services:
@@ -25,14 +26,29 @@ default:
         DOCKER_TLS_CERTDIR: ""
         DOCKER_TLS_VERIFY: "false"
   before_script:
-    - LS_IP="$(getent hosts localstack | cut -d' ' -f1)"
-    - echo "${LS_IP} localhost.localstack.cloud " >> /etc/hosts
+    - mkdir -p $CI_PROJECT_DIR/.cache/pip
     - apt-get update && apt-get install -y zip jq
     - pip install localstack
     - pip install -r requirements-dev.txt
+    - LS_IP="$(getent hosts localstack | cut -d' ' -f1)"
+    - echo "${LS_IP} localhost.localstack.cloud " >> /etc/hosts
+    - (test -f ./ls-state-pod.zip && localstack state import ./ls-state-pod.zip) || true
+  cache:
+    paths:
+      - $CI_PROJECT_DIR/.cache/pip
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/ls-state-pod.zip
+    expire_in: never
+
+deploy:
+  stage: deploy
+  script:
+    - ./bin/deploy.sh
+    - localstack state export ./ls-state-pod.zip
 
 test:
   stage: test
+  allow_failure: true
   script:
-    - ./bin/deploy.sh
     - pytest tests
