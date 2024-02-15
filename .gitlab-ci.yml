@@ -13,13 +13,14 @@ variables:
   DEBUG: 1
   LS_LOG: "trace"
   PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
+  LOCALSTACK_AUTH_TOKEN: $LOCALSTACK_AUTH_TOKEN
 
 default:
   services:
     - name: docker:20.10.21-dind-alpine3.17
       alias: docker
       command: ["--tls=false"]
-    - name: localstack/localstack:latest
+    - name: localstack/localstack-pro:latest
       alias: localstack
       variables:
         DOCKER_HOST: tcp://docker:2375
