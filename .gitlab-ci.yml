@@ -1,4 +1,4 @@
-image: "python:3.9.16"
+image: docker:20.10.16-dind
 
 stages:
   - deploy
@@ -10,30 +10,48 @@ variables:
   AWS_DEFAULT_REGION: us-east-1
   AWS_REGION: us-east-1
   AWS_ENDPOINT_URL: http://localhost.localstack.cloud:4566
-  DEBUG: 1
-  LS_LOG: "trace"
   PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
-  LOCALSTACK_AUTH_TOKEN: $LOCALSTACK_AUTH_TOKEN
+  LOCALSTACK_AUTH_TOKEN: '${LS_AUTH_TOKEN}'
+  DEBUG: '${DEBUG}'
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+
+services:
+  - name: docker:20.10.16-dind
+    alias: docker
+    command: ["--tls=false"]
 
 default:
-  services:
-    - name: docker:20.10.21-dind-alpine3.17
-      alias: docker
-      command: ["--tls=false"]
-    - name: localstack/localstack-pro:latest
-      alias: localstack
-      variables:
-        DOCKER_HOST: tcp://docker:2375
-        DOCKER_TLS_CERTDIR: ""
-        DOCKER_TLS_VERIFY: "false"
-  before_script:
-    - mkdir -p $CI_PROJECT_DIR/.cache/pip
-    - apt-get update && apt-get install -y zip jq
-    - pip install localstack
-    - pip install -r requirements-dev.txt
-    - LS_IP="$(getent hosts localstack | cut -d' ' -f1)"
-    - echo "${LS_IP} localhost.localstack.cloud " >> /etc/hosts
+  before_script: &default_before_scripts
+    - apk update
+    - apk add --no-cache gcc musl-dev linux-headers bash zip jq
+    - apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/main python3~3.9
+    - apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/community py3-psutil~5.8
+    - python3 -m ensurepip
+    - python3 -m pip install --no-cache --upgrade pip setuptools
+    - mkdir -p $PIP_CACHE_DIR
+    - python3 -m pip install localstack awscli awscli-local
+    - docker pull localstack/localstack-pro:latest
+    - dind_ip="$(getent hosts docker | cut -d' ' -f1)"
+    - echo "${dind_ip} localhost.localstack.cloud " >> /etc/hosts
+    - localstack start -d
+    - localstack wait -t 30
     - (test -f ./ls-state-pod.zip && localstack state import ./ls-state-pod.zip) || true
+    # - apt-get update && apt-get install -y ca-certificates curl
+    # - install -m 0755 -d /etc/apt/keyrings
+    # - curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+    # - chmod a+r /etc/apt/keyrings/docker.asc
+    # - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    # - apt-get update
+    # - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    # - apt-get install -y zip jq
+    # - mkdir -p $PIP_CACHE_DIR
+    # - pip install localstack
+    # - pip install -r requirements-dev.txt
+    # - DIND_IP="$(getent hosts docker | cut -d' ' -f1)"
+    # - echo "${DIND_IP} localhost.localstack.cloud " >> /etc/hosts
+    # - localstack start -d
+    # - (test -f ./ls-state-pod.zip && localstack state import ./ls-state-pod.zip) || true
   cache:
     paths:
       - $CI_PROJECT_DIR/.cache/pip
@@ -50,6 +68,8 @@ deploy:
 
 test:
   stage: test
-  allow_failure: true
+  before_script:
+    - *default_before_scripts
+    - python3 -m pip install -r requirements-dev.txt
   script:
-    - pytest tests
+    - python3 -m pytest tests
