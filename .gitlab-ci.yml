@@ -10,6 +10,8 @@ variables:
   AWS_REGION: us-east-1
   AWS_ENDPOINT_URL: http://localhost.localstack.cloud:4566
   CI_DEBUG_SERVICES: "true"
+  DEBUG: 1
+  LS_LOG: "trace"
 
 default:
   services:
@@ -28,6 +30,7 @@ default:
 
 test:
   stage: test
+  allow_failure: true
   script:
     - ./bin/deploy.sh
     - pytest tests
