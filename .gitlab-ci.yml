@@ -19,18 +19,20 @@ default:
       alias: docker
       command: ["--tls=false"]
     - name: localstack/localstack:latest
-      alias: localhost.localstack.cloud
+      alias: localstack
       variables:
         DOCKER_HOST: tcp://docker:2375
         DOCKER_TLS_CERTDIR: ""
         DOCKER_TLS_VERIFY: "false"
   before_script:
+    - LS_IP="$(getent hosts localstack | cut -d' ' -f1)"
+    - echo "${LS_IP} localhost.localstack.cloud " >> /etc/hosts
     - apt-get update && apt-get install -y zip jq
+    - pip install localstack
     - pip install -r requirements-dev.txt
 
 test:
   stage: test
-  allow_failure: true
   script:
     - ./bin/deploy.sh
     - pytest tests
