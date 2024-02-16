@@ -62,23 +62,21 @@ default:
 
 deploy:
   stage: deploy
+  # before_script:
+  #   - *default_before_scripts
+  #   - python3 -m pip install -r requirements-dev.txt
+  script:
+    - ./bin/deploy.sh
+    # - python3 -m pytest tests
+    - localstack state export ./ls-state-pod.zip
+
+test:
+  stage: test
   before_script:
     - *default_before_scripts
     - python3 -m pip install -r requirements-dev.txt
   script:
-    - ./bin/deploy.sh
     - python3 -m pytest tests
-    - localstack state export ./ls-state-pod.zip
   after_script:
     - docker ps
     - localstack logs
-
-# test:
-#   stage: test
-#   before_script:
-#     - *default_before_scripts
-#     - python3 -m pip install -r requirements-dev.txt
-#   script:
-#     - python3 -m pytest tests
-#   after_script:
-#     - localstack logs
