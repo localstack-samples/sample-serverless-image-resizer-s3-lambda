@@ -37,21 +37,6 @@ default:
     - localstack start -d
     - localstack wait -t 30
     - (test -f ./ls-state-pod.zip && localstack state import ./ls-state-pod.zip) || true
-    # - apt-get update && apt-get install -y ca-certificates curl
-    # - install -m 0755 -d /etc/apt/keyrings
-    # - curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-    # - chmod a+r /etc/apt/keyrings/docker.asc
-    # - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-    # - apt-get update
-    # - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    # - apt-get install -y zip jq
-    # - mkdir -p $PIP_CACHE_DIR
-    # - pip install localstack
-    # - pip install -r requirements-dev.txt
-    # - DIND_IP="$(getent hosts docker | cut -d' ' -f1)"
-    # - echo "${DIND_IP} localhost.localstack.cloud " >> /etc/hosts
-    # - localstack start -d
-    # - (test -f ./ls-state-pod.zip && localstack state import ./ls-state-pod.zip) || true
   cache:
     paths:
       - $CI_PROJECT_DIR/.cache/pip
@@ -62,12 +47,8 @@ default:
 
 deploy:
   stage: deploy
-  # before_script:
-  #   - *default_before_scripts
-  #   - python3 -m pip install -r requirements-dev.txt
   script:
     - ./bin/deploy.sh
-    # - python3 -m pytest tests
     - localstack state export ./ls-state-pod.zip
 
 test:
