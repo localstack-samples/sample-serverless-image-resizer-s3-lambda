@@ -13,7 +13,6 @@ variables:
   PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
-  CI_DEBUG_TRACE: "true"
   LS_LOG: trace
 
 services:
