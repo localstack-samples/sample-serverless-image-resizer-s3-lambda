@@ -23,7 +23,7 @@ services:
 default:
   before_script: &default_before_scripts
     - apk update
-    - apk add --no-cache gcc musl-dev linux-headers bash zip jq
+    - apk add --no-cache gcc musl-dev linux-headers bash zip jq curl
     - apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/main python3~3.9
     - apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/community py3-psutil~5.8
     - python3 -m ensurepip
