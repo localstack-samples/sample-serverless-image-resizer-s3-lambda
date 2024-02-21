@@ -13,6 +13,7 @@ variables:
   PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
+  DEBUG: 1
   LS_LOG: trace
 
 services:
@@ -37,10 +38,9 @@ default:
     - localstack wait -t 30
     - (test -f ./ls-state-pod.zip && localstack state import ./ls-state-pod.zip) || true
   after_script:
+    - curl "$AWS_ENDPOINT_URL/_localstack/diagnose" | tee ls_diagnose.log
     - docker ps | tee docker_ps.log
     - docker inspect localstack-main | tee docker_inspect.log
-    - curl ${AWS_ENDPOINT_URL}:4566/_localstack/diagnose | tee ls_diagnose.log
-    - localstack logs | tee ls_runlogs.log
   cache:
     paths:
       - $CI_PROJECT_DIR/.cache/pip
