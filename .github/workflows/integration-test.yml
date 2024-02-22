@@ -13,13 +13,18 @@ on:
     # “At 00:00 on Sunday.”
     - cron: "0 0 * * 0"
   workflow_dispatch:
+    inputs:
+      runner-os:
+        default: ubuntu-latest
+        type: choice
+        options:
+          - ubuntu-latest
+          - macos-latest
+
 
 jobs:
   run-it-tests-job:
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ inputs.runner-os || 'ubuntu-latest' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
