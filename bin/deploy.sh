@@ -17,7 +17,7 @@ awslocal sns subscribe \
 (cd lambdas/presign; rm -f lambda.zip; zip lambda.zip handler.py)
 awslocal lambda create-function \
     --function-name presign \
-    --runtime python3.9 \
+    --runtime python3.11 \
     --timeout 10 \
     --zip-file fileb://lambdas/presign/lambda.zip \
     --handler handler.handler \
@@ -33,7 +33,7 @@ awslocal lambda create-function-url-config \
 (cd lambdas/list; rm -f lambda.zip; zip lambda.zip handler.py)
 awslocal lambda create-function \
     --function-name list \
-    --runtime python3.9 \
+    --runtime python3.11 \
     --timeout 10 \
     --zip-file fileb://lambdas/list/lambda.zip \
     --handler handler.handler \
@@ -51,7 +51,7 @@ if [ "$os" == "Darwin" ]; then
     (
         cd lambdas/resize
         rm -rf libs lambda.zip
-        docker run --platform linux/x86_64 -v "$PWD":/var/task "public.ecr.aws/sam/build-python3.9" /bin/sh -c "pip install -r requirements.txt -t libs; exit"
+        docker run --platform linux/x86_64 -v "$PWD":/var/task "public.ecr.aws/sam/build-python3.11" /bin/sh -c "pip install -r requirements.txt -t libs; exit"
         cd libs && zip -r ../lambda.zip . && cd ..
         zip lambda.zip handler.py
         rm -rf libs
@@ -70,7 +70,7 @@ fi
 
 awslocal lambda create-function \
     --function-name resize \
-    --runtime python3.9 \
+    --runtime python3.11 \
     --timeout 10 \
     --zip-file fileb://lambdas/resize/lambda.zip \
     --handler handler.handler \
