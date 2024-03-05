@@ -96,4 +96,5 @@ awslocal lambda list-function-url-configs --function-name presign | jq -r '.Func
 echo "Fetching function URL for 'list' Lambda..."
 awslocal lambda list-function-url-configs --function-name list | jq -r '.FunctionUrlConfigs[0].FunctionUrl'
 
-echo "Now open the Web app under https://webapp.s3-website.localhost.localstack.cloud and paste the function URLs above (make sure to use https:// as protocol)"
+echo "Now open the Web app under https://webapp.s3-website.localhost.localstack.cloud:4566/"
+echo "and paste the function URLs above (make sure to use https:// as protocol)"
