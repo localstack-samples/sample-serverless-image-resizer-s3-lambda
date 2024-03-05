@@ -81,9 +81,10 @@ awslocal lambda create-function \
 awslocal lambda wait function-active-v2 --function-name resize
 awslocal lambda put-function-event-invoke-config --function-name resize --maximum-event-age-in-seconds 3600 --maximum-retry-attempts 0
 
+fn_resize_arn=$(awslocal lambda get-function --function-name resize | jq -r .Configuration.FunctionArn)
 awslocal s3api put-bucket-notification-configuration \
     --bucket localstack-thumbnails-app-images \
-    --notification-configuration "{\"LambdaFunctionConfigurations\": [{\"LambdaFunctionArn\": \"$(awslocal lambda get-function --function-name resize | jq -r .Configuration.FunctionArn)\", \"Events\": [\"s3:ObjectCreated:*\"]}]}"
+    --notification-configuration "{\"LambdaFunctionConfigurations\": [{\"LambdaFunctionArn\": \"$fn_resize_arn\", \"Events\": [\"s3:ObjectCreated:*\"]}]}"
 
 awslocal s3 mb s3://webapp
 awslocal s3 sync --delete ./website s3://webapp
