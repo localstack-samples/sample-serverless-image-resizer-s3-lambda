@@ -29,17 +29,30 @@ jobs:
           key: python-deps
   load-state:
     executor: localstack/default
+    environment:
+        AWS_DEFAULT_REGION: us-east-1
+        AWS_REGION: us-east-1
+        AWS_ACCESS_KEY_ID: test
+        AWS_SECRET_ACCESS_KEY: test
     steps:
-      - localstack/start        
-      - checkout
       - restore_cache:
           key: python-deps
+      - localstack/start        
+      - checkout
+      - run:
+          name: Install dependencies
+          command:
+            pip3 install -r requirements-dev.txt
       - localstack/wait
       - restore_cache:
           key: ls-state
       - run:
           name: Import state
-          command: (test -f ls-state.zip && localstack state import ls-state.zip) || true
+          command: test -f ls-state.zip && localstack state import ls-state.zip
+      - run:
+          name: Run Tests
+          command:
+            pytest tests
 workflows:
   do-tests:
     jobs:
