@@ -5,6 +5,11 @@ jobs:
   save-state:
     executor: localstack/default
     steps:
+      - run:
+          name: Install Python 3.9
+          command: |
+            pyenv install 3.9.16
+            pyenv global 3.9.16
       - localstack/start        
       - checkout
       - run:
@@ -25,7 +30,7 @@ jobs:
           key: ls-state
       - save_cache:
           paths:
-            - ~/.cache/pip
+            - /opt/circleci/.pyenv/versions/3.9.16
           key: python-deps
   load-state:
     executor: localstack/default
@@ -39,6 +44,10 @@ jobs:
     steps:
       - restore_cache:
           key: python-deps
+      - run:
+          name: Choose python version
+          command:
+            pyenv global 3.9.16
       - localstack/start        
       - checkout
       - run:
