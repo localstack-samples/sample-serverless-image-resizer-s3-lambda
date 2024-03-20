@@ -27,11 +27,11 @@ jobs:
       - save_cache:
           paths:
             - ls-state.zip
-          key: ls-state
+          key: ls-state-{{epoch}}
       - save_cache:
           paths:
             - /opt/circleci/.pyenv/versions/3.9.16
-          key: python-deps
+          key: python-deps-{{epoch}}
   load-state:
     executor: localstack/default
     environment:
@@ -43,7 +43,7 @@ jobs:
         LS_LOG: trace
     steps:
       - restore_cache:
-          key: python-deps
+          key: python-deps-
       - run:
           name: Choose python version
           command:
@@ -56,7 +56,7 @@ jobs:
             pip3 install -r requirements-dev.txt
       - localstack/wait
       - restore_cache:
-          key: ls-state
+          key: ls-state-
       - run:
           name: Import state
           command: test -f ls-state.zip && localstack state import ls-state.zip
