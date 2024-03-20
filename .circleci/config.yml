@@ -1,11 +1,8 @@
 version: 2.1
 orbs:
   localstack: localstack/platform@2.1
-
 jobs:
   save-state:
-    docker:
-      - image: cimg/python:3.9
     executor: localstack/default
     steps:
       - localstack/start        
@@ -13,7 +10,7 @@ jobs:
       - run:
           name: Install dependencies
           command:
-            pip install -r requirements-dev.txt
+            pip3 install -r requirements-dev.txt
       - localstack/wait
       - run:
           name: Deploy infrastructure
@@ -26,21 +23,17 @@ jobs:
           paths:
             - ls-state.zip
           key: ls-state
-      # - save_cache:
-      #     paths:
-      #       - ~/.cache/pip
-      #     key: python-deps
+      - save_cache:
+          paths:
+            - ~/.cache/pip
+          key: python-deps
   load-state:
-    docker:
-      - image: cimg/python:3.9
     executor: localstack/default
     steps:
       - localstack/start        
       - checkout
-      - run:
-          name: Install dependencies
-          command:
-            pip install -r requirements-dev.txt
+      - restore_cache:
+          key: python-deps
       - localstack/wait
       - restore_cache:
           key: ls-state
@@ -48,9 +41,8 @@ jobs:
           name: Import state
           command: (test -f ls-state.zip && localstack state import ls-state.zip) || true
 workflows:
-  setup-infra:
+  do-tests:
     jobs:
       - save-state
-  test:
-    jobs:
-      - load-state
+      - load-state:
+          requires: [save-state]
