@@ -1,8 +1,11 @@
 version: 2.1
 orbs:
   localstack: localstack/platform@2.1
+
 jobs:
   save-state:
+    docker:
+      - image: cimg/python:3.9
     executor: localstack/default
     steps:
       - localstack/start        
@@ -28,6 +31,8 @@ jobs:
       #       - ~/.cache/pip
       #     key: python-deps
   load-state:
+    docker:
+      - image: cimg/python:3.9
     executor: localstack/default
     steps:
       - localstack/start        
