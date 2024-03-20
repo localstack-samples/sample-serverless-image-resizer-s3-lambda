@@ -34,6 +34,8 @@ jobs:
         AWS_REGION: us-east-1
         AWS_ACCESS_KEY_ID: test
         AWS_SECRET_ACCESS_KEY: test
+        DEBUG: 1
+        LS_LOG: trace
     steps:
       - restore_cache:
           key: python-deps
@@ -53,6 +55,10 @@ jobs:
           name: Run Tests
           command:
             pytest tests
+      - run:
+          when: on_fail
+          name: Dump Localstack logs
+          command: localstack logs | tee localstack.log
 workflows:
   do-tests:
     jobs:
