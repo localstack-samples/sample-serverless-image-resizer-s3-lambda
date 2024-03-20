@@ -2,16 +2,50 @@ version: 2.1
 orbs:
   localstack: localstack/platform@2.1
 jobs:
-  localstack-test:
+  save-state:
     executor: localstack/default
     steps:
-      - localstack/start
+      - localstack/start        
+      - checkout
       - run:
-          command: echo "Running my custom application initialization logic ..."
+          name: Install dependencies
+          command:
+            pip install -r requirements-dev.txt
       - localstack/wait
       - run:
-          command: echo "Now LocalStack has fully started up, and is ready to use!"
+          name: Deploy infrastructure
+          command:
+            bin/deploy.sh
+      - run:
+          name: Export state
+          command: localstack state export ls-state.zip
+      - save_cache:
+          paths:
+            - ls-state.zip
+          key: ls-state
+      # - save_cache:
+      #     paths:
+      #       - ~/.cache/pip
+      #     key: python-deps
+  load-state:
+    executor: localstack/default
+    steps:
+      - localstack/start        
+      - checkout
+      - run:
+          name: Install dependencies
+          command:
+            pip install -r requirements-dev.txt
+      - localstack/wait
+      - restore_cache:
+          key: ls-state
+      - run:
+          name: Import state
+          command: (test -f ls-state.zip && localstack state import ls-state.zip) || true
 workflows:
-  localstack-test:
+  setup-infra:
     jobs:
-      - localstack-test
+      - save-state
+  test:
+    jobs:
+      - load-state
