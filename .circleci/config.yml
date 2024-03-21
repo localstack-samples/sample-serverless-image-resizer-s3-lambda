@@ -32,6 +32,8 @@ jobs:
           paths:
             - /opt/circleci/.pyenv/versions/3.9.16
           key: python-deps-{{epoch}}
+      - store_artifacts:
+          path: ls-state.zip
   load-state:
     executor: localstack/default
     environment:
