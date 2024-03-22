@@ -5,17 +5,19 @@ jobs:
   save-state:
     executor: localstack/default
     steps:
+      - restore_cache:
+          key: python-deps-
       - run:
           name: Install Python 3.9
           command: |
-            pyenv install 3.9.16
+            test -d /opt/circleci/.pyenv/versions/3.9.16 || pyenv install 3.9.16
             pyenv global 3.9.16
       - localstack/start        
       - checkout
       - run:
           name: Install dependencies
           command:
-            pip3 install -r requirements-dev.txt
+            pip3 install -r requirements-dev.txt --upgrade
       - localstack/wait
       - run:
           name: Deploy infrastructure
