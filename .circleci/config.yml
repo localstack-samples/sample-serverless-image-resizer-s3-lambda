@@ -1,6 +1,10 @@
 version: 2.1
+
+
 orbs:
   localstack: localstack/platform@2.1
+
+
 jobs:
   save-state:
     executor: localstack/default
@@ -36,6 +40,8 @@ jobs:
           key: python-deps-{{epoch}}
       - store_artifacts:
           path: ls-state.zip
+
+
   load-state:
     executor: localstack/default
     environment:
@@ -72,6 +78,10 @@ jobs:
           when: on_fail
           name: Dump Localstack logs
           command: localstack logs | tee localstack.log
+      - store_artifacts:
+          path: localstack.log
+
+
 workflows:
   do-tests:
     jobs:
