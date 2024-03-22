@@ -24,10 +24,10 @@ jobs:
       - run:
           name: Export state
           command: localstack state export ls-state.zip
-      - save_cache:
+      - persist_to_workspace:
+          root: .
           paths:
             - ls-state.zip
-          key: ls-state-{{epoch}}
       - save_cache:
           paths:
             - /opt/circleci/.pyenv/versions/3.9.16
@@ -57,8 +57,8 @@ jobs:
           command:
             pip3 install -r requirements-dev.txt
       - localstack/wait
-      - restore_cache:
-          key: ls-state-
+      - attach_workspace:
+          at: .
       - run:
           name: Import state
           command: test -f ls-state.zip && localstack state import ls-state.zip
