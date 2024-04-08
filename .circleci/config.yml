@@ -10,7 +10,9 @@ jobs:
     executor: localstack/default
     steps:
       - restore_cache:
-          key: python-deps-
+          keys:
+            - python-deps-{{ checksum "requirements-dev.txt" }}
+            - python-deps
       - run:
           name: Install Python 3.9
           command: |
@@ -37,7 +39,7 @@ jobs:
       - save_cache:
           paths:
             - /opt/circleci/.pyenv/versions/3.9.16
-          key: python-deps-{{epoch}}
+          key: python-deps-{{ checksum "requirements-dev.txt" }}
       - store_artifacts:
           path: ls-state.zip
 
