@@ -25,14 +25,19 @@ phases:
           use-pro: 'true'
           configuration: LS_LOG=trace
           install-awslocal: 'true'
-      - name: Load Pod
-        uses: LocalStack/setup-localstack@cloud-pods
+      # - name: Load Pod
+      #   uses: LocalStack/setup-localstack/cloud-pods@main
+      #   with:
+      #     name: codebuild-pod
+      #     action: load
+  pre_build:
+    steps:
+      - run: bin/deploy.sh
+      - name: Save Pod
+        uses: LocalStack/setup-localstack/cloud-pods@main
         with:
           name: codebuild-pod
-          action: load
-  pre_build:
-    commands:
-      - bin/deploy.sh
+          action: save
   build:
     commands:
       - pytest tests
