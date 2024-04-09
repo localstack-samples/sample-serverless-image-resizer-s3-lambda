@@ -13,8 +13,8 @@ phases:
       python: 3.11
     steps:
       - run: |
-          pyenv install 3.9
-          pyenv global 3.9
+          test -d /root/.pyenv/versions/3.9.16/bin || pyenv install 3.9.16
+          pyenv global 3.9.16
       - run: pip install -r requirements-dev.txt
       - run: docker pull public.ecr.aws/localstack/localstack-pro:latest
       - run: docker image tag public.ecr.aws/localstack/localstack-pro:latest localstack/localstack-pro:latest
@@ -33,3 +33,7 @@ phases:
       - pytest tests
     finally:
       - localstack logs
+
+cache:
+  paths:
+    - /root/.pyenv/versions/3.9.16
