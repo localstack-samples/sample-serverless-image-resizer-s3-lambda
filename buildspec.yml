@@ -11,10 +11,8 @@ phases:
   install:
     runtime-versions:
       python: 3.11
-    commands:
-      - pip install -r requirements-dev.txt
-  pre_build:
     steps:
+      - run: pip install -r requirements-dev.txt
       - run: docker pull public.ecr.aws/localstack/localstack-pro:latest
       - run: docker image tag public.ecr.aws/localstack/localstack-pro:latest localstack/localstack-pro:latest
       - name: Start LocalStack
@@ -24,9 +22,9 @@ phases:
           use-pro: 'true'
           configuration: LS_LOG=trace
           install-awslocal: 'true'
-        # env:
-        #   LOCALSTACK_AUTH_TOKEN: $LOCALSTACK_AUTH_TOKEN
-      - run: bin/deploy.sh
+  pre_build:
+    commands:
+      - bin/deploy.sh
   build:
     commands:
       - pytest tests
