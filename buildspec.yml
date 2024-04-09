@@ -22,8 +22,8 @@ phases:
           use-pro: 'true'
           configuration: LS_LOG=trace
           install-awslocal: 'true'
-        env:
-          LOCALSTACK_API_KEY: ${{ env.LOCALSTACK_API_KEY }}
+        # env:
+        #   LOCALSTACK_AUTH_TOKEN: $LOCALSTACK_AUTH_TOKEN
       - run: bin/deploy.sh
   build:
     commands:
