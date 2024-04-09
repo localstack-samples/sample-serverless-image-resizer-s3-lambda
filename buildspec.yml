@@ -8,6 +8,8 @@ env:
     AWS_SECRET_ACCESS_KEY: test
   parameter-store:
     LOCALSTACK_AUTH_TOKEN: /CodeBuild/LOCALSTACK_AUTH_TOKEN
+    GITHUB_PAT: /CodeBuild/GH_TOKEN
+    GITHUB_PAT_GITHUB_COM: /CodeBuild/GH_TOKEN
 
 phases:
   install:
