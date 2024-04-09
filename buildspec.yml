@@ -6,6 +6,8 @@ env:
     AWS_REGION: us-east-1
     AWS_ACCESS_KEY_ID: test
     AWS_SECRET_ACCESS_KEY: test
+  parameter-store:
+    LOCALSTACK_AUTH_TOKEN: /CodeBuild/LOCALSTACK_AUTH_TOKEN
 
 phases:
   install:
