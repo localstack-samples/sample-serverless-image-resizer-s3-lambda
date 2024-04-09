@@ -30,3 +30,5 @@ phases:
   build:
     commands:
       - pytest tests
+    finally:
+      - localstack logs
