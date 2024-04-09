@@ -12,6 +12,9 @@ phases:
     runtime-versions:
       python: 3.11
     steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
       - run: pip install -r requirements-dev.txt
       - run: docker pull public.ecr.aws/localstack/localstack-pro:latest
       - run: docker image tag public.ecr.aws/localstack/localstack-pro:latest localstack/localstack-pro:latest
