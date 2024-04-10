@@ -6,6 +6,8 @@ env:
     AWS_REGION: us-east-1
     AWS_ACCESS_KEY_ID: test
     AWS_SECRET_ACCESS_KEY: test
+    DEBUG: 1
+    LS_LOG: trace
   parameter-store:
     LOCALSTACK_AUTH_TOKEN: /CodeBuild/LOCALSTACK_AUTH_TOKEN
   git-credential-helper: yes
@@ -14,33 +16,27 @@ phases:
   install:
     runtime-versions:
       python: 3.11
-    steps:
-      - run: |
-          test -d /root/.pyenv/versions/3.9.16/bin || pyenv install 3.9.16
-          pyenv global 3.9.16
-      - run: pip install -r requirements-dev.txt
-      - run: docker pull public.ecr.aws/localstack/localstack-pro:latest
-      - run: docker image tag public.ecr.aws/localstack/localstack-pro:latest localstack/localstack-pro:latest
-      - name: Start LocalStack
-        uses: LocalStack/setup-localstack@main
-        with:
-          image-tag: 'latest'
-          use-pro: 'true'
-          configuration: LS_LOG=trace
-          install-awslocal: 'true'
+    commands:
+      - test -d /root/.pyenv/versions/3.9.16/bin || pyenv install 3.9.16
+      - pyenv global 3.9.16
+      - pip install -r requirements-dev.txt
+      - pip install localstack
+      - docker pull public.ecr.aws/localstack/localstack-pro:latest
+      - docker image tag public.ecr.aws/localstack/localstack-pro:latest localstack/localstack-pro:latest
+      - localstack start -d
       # - name: Load Pod
       #   uses: LocalStack/setup-localstack/cloud-pods@main
       #   with:
       #     name: codebuild-pod
       #     action: load
   pre_build:
-    steps:
-      - run: bin/deploy.sh
-      - name: Save Pod
-        uses: LocalStack/setup-localstack/cloud-pods@main
-        with:
-          name: codebuild-pod
-          action: save
+    commands:
+      - bin/deploy.sh
+      # - name: Save Pod
+      #   uses: LocalStack/setup-localstack/cloud-pods@main
+      #   with:
+      #     name: codebuild-pod
+      #     action: save
   build:
     commands:
       - pytest tests
