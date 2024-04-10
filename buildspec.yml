@@ -8,6 +8,7 @@ env:
     AWS_SECRET_ACCESS_KEY: test
   parameter-store:
     LOCALSTACK_AUTH_TOKEN: /CodeBuild/LOCALSTACK_AUTH_TOKEN
+  git-credential-helper: yes
 
 phases:
   install:
