@@ -10,14 +10,13 @@ env:
     LS_LOG: trace
   parameter-store:
     LOCALSTACK_AUTH_TOKEN: /CodeBuild/LOCALSTACK_AUTH_TOKEN
-  git-credential-helper: yes
 
 phases:
   install:
     runtime-versions:
       python: 3.11
     commands:
-      - test -d /root/.pyenv/versions/3.9.16/bin || pyenv install 3.9.16
+      - test -d /root/.pyenv/versions/3.9.16 || pyenv install 3.9.16
       - pyenv global 3.9.16
       - pip install -r requirements-dev.txt
       - pip install localstack
@@ -45,4 +44,5 @@ phases:
 
 cache:
   paths:
-    - /root/.pyenv/versions/3.9.16
+    - '/root/.pyenv/versions/3.9.16/**/*'
+    
