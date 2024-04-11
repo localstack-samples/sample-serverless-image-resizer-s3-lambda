@@ -31,7 +31,10 @@ def handler(event, context):
         raise ValueError("no key given")
 
     # make sure the bucket exists
-    s3.create_bucket(Bucket=bucket)
+    try: 
+        s3.head_bucket(Bucket=bucket)
+    except Exception:
+        s3.create_bucket(Bucket=bucket)
 
     # make sure the object does not exist
     try:
