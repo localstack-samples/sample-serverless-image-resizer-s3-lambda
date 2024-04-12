@@ -1,0 +1,92 @@
+version: 2.1
+
+
+orbs:
+  localstack: localstack/platform@2.1
+
+
+jobs:
+  save-state:
+    executor: localstack/default
+    steps:
+      - restore_cache:
+          keys:
+            - python-deps-{{ checksum "requirements-dev.txt" }}
+            - python-deps
+      - run:
+          name: Install Python 3.9
+          command: |
+            test -d /opt/circleci/.pyenv/versions/3.9.16 || pyenv install 3.9.16
+            pyenv global 3.9.16
+      - localstack/start        
+      - checkout
+      - run:
+          name: Install dependencies
+          command:
+            pip3 install -r requirements-dev.txt --upgrade
+      - localstack/wait
+      - run:
+          name: Deploy infrastructure
+          command:
+            bin/deploy.sh
+      - run:
+          name: Export state
+          command: localstack state export ls-state.zip
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ls-state.zip
+      - save_cache:
+          paths:
+            - /opt/circleci/.pyenv/versions/3.9.16
+          key: python-deps-{{ checksum "requirements-dev.txt" }}
+      - store_artifacts:
+          path: ls-state.zip
+
+
+  load-state:
+    executor: localstack/default
+    environment:
+        AWS_DEFAULT_REGION: us-east-1
+        AWS_REGION: us-east-1
+        AWS_ACCESS_KEY_ID: test
+        AWS_SECRET_ACCESS_KEY: test
+        DEBUG: 1
+        LS_LOG: trace
+    steps:
+      - restore_cache:
+          key: python-deps-
+      - run:
+          name: Choose python version
+          command:
+            pyenv global 3.9.16
+      - localstack/start        
+      - checkout
+      - run:
+          name: Install dependencies
+          command:
+            pip3 install -r requirements-dev.txt
+      - localstack/wait
+      - attach_workspace:
+          at: .
+      - run:
+          name: Import state
+          command: test -f ls-state.zip && localstack state import ls-state.zip
+      - run:
+          name: Run Tests
+          command:
+            pytest tests
+      - run:
+          when: on_fail
+          name: Dump Localstack logs
+          command: localstack logs | tee localstack.log
+      - store_artifacts:
+          path: localstack.log
+
+
+workflows:
+  do-tests:
+    jobs:
+      - save-state
+      - load-state:
+          requires: [save-state]
