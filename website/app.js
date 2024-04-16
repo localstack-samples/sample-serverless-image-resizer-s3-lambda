@@ -78,21 +78,23 @@
         let urlToCall = functionUrlPresign + "/" + fileName
         console.log(urlToCall);
 
-        let form = this;
-
         $.ajax({
             url: urlToCall,
             success: function (data) {
                 console.log("got pre-signed POST URL", data);
 
-                // set form fields to make it easier to serialize
                 let fields = data['fields'];
-                $(form).attr("action", data['url']);
-                for (let key in fields) {
-                    $("#" + key).val(fields[key]);
-                }
 
-                let formData = new FormData($("#uploadForm")[0]);
+                let formData = new FormData()
+                
+                Object.entries(fields).forEach(([field, value]) => {
+                    formData.append(field, value);
+                });
+
+                // the file <input> element, "file" needs to be the last element of the form
+                const fileElement = document.querySelector("#customFile");
+                formData.append("file", fileElement.files[0]);
+
                 console.log("sending form data", formData);
 
                 $.ajax({
