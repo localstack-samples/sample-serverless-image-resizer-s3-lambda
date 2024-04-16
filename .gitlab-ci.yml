@@ -1,0 +1,65 @@
+image: docker:20.10.16-dind
+
+stages:
+  - deploy
+  - test
+
+variables:
+  AWS_ACCESS_KEY_ID: test
+  AWS_SECRET_ACCESS_KEY: test
+  AWS_DEFAULT_REGION: us-east-1
+  AWS_REGION: us-east-1
+  AWS_ENDPOINT_URL: http://localhost.localstack.cloud:4566
+  PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  DEBUG: 1
+  LS_LOG: trace
+
+services:
+  - name: docker:20.10.16-dind
+    alias: docker
+    command: ["--tls=false"]
+
+default:
+  before_script: &default_before_scripts
+    - apk update
+    - apk add --no-cache gcc musl-dev linux-headers bash zip jq curl
+    - apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/main python3~3.9
+    - apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/community py3-psutil~5.8
+    - python3 -m ensurepip
+    - python3 -m pip install --no-cache --upgrade pip setuptools
+    - mkdir -p $PIP_CACHE_DIR
+    - python3 -m pip install localstack awscli awscli-local
+    - docker pull localstack/localstack-pro:latest
+    - dind_ip="$(getent hosts docker | cut -d' ' -f1)"
+    - echo "${dind_ip} localhost.localstack.cloud " >> /etc/hosts
+    - localstack start -d
+    - localstack wait -t 30
+    - (test -f ./ls-state-pod.zip && localstack state import ./ls-state-pod.zip) || true
+  after_script:
+    - curl "$AWS_ENDPOINT_URL/_localstack/diagnose" | tee ls_diagnose.log
+    - docker ps | tee docker_ps.log
+    - docker inspect localstack-main | tee docker_inspect.log
+  cache:
+    paths:
+      - $CI_PROJECT_DIR/.cache/pip
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/ls-state-pod.zip
+    expire_in: 1 days
+
+deploy:
+  stage: deploy
+  script:
+    - ./bin/deploy.sh
+    - localstack state export ./ls-state-pod.zip
+
+test:
+  stage: test
+  before_script:
+    - *default_before_scripts
+    - python3 -m pip install -r requirements-dev.txt
+  script:
+    - python3 -m pytest tests
+

@@ -71,7 +71,7 @@ def test_failure_sns_to_ses_integration():
     s3.upload_file(file, Bucket=source_bucket, Key=key)
 
     def _check_message():
-        response = requests.get("http://localhost:4566/_aws/ses")
+        response = requests.get("http://localhost.localstack.cloud:4566/_aws/ses")
         messages = response.json()["messages"]
         assert key in messages[-1]["Body"]["text_part"]
 
