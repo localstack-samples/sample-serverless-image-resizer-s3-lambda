@@ -46,16 +46,16 @@ The GitHub workflow runs a set of integration tests using pytest.
 ### Dev environment
 
 Make sure you use the same version as the Python Lambdas to make Pillow work.
-If you use pyenv, then first install and activate Python 3.9:
+If you use pyenv, then first install and activate Python 3.11:
 
 ```bash
-pyenv install 3.9.16
-pyenv global 3.9.16
+pyenv install 3.11.6
+pyenv global 3.11.6
 ```
 
 ```console
 % python --version
-Python 3.9.16
+Python 3.11.6
 ```
 
 Create a virtualenv and install all the development dependencies there:
@@ -77,7 +77,7 @@ LOCALSTACK_API_KEY=... localstack start
 ## Instructions
 
 You can create the AWS infrastructure on LocalStack by running `bin/deploy.sh`.
-Make sure you have Python 3.9 activated before running the script.
+Make sure you have Python 3.11 activated before running the script.
 
 Here are instructions to deploy it manually step-by-step.
 
@@ -122,7 +122,7 @@ This Lambda is responsible for generating pre-signed POST URLs to upload files t
 (cd lambdas/presign; rm -f lambda.zip; zip lambda.zip handler.py)
 awslocal lambda create-function \
     --function-name presign \
-    --runtime python3.9 \
+    --runtime python3.11 \
     --timeout 10 \
     --zip-file fileb://lambdas/presign/lambda.zip \
     --handler handler.handler \
@@ -150,7 +150,7 @@ awslocal lambda create-function \
     --function-name list \
     --handler handler.handler \
     --zip-file fileb://lambdas/list/lambda.zip \
-    --runtime python3.9 \
+    --runtime python3.11 \
     --role arn:aws:iam::000000000000:role/lambda-role \
     --environment Variables="{STAGE=local}"
 ```
@@ -177,7 +177,7 @@ awslocal lambda create-function-url-config \
 )
 awslocal lambda create-function \
     --function-name resize \
-    --runtime python3.9 \
+    --runtime python3.11 \
     --timeout 10 \
     --zip-file fileb://lambdas/resize/lambda.zip \
     --handler handler.handler \
