@@ -15,6 +15,7 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   DEBUG: 1
   LS_LOG: trace
+  LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT: 300
 
 services:
   - name: docker:24.0.7-dind-alpine3.18 #docker:20.10.16-dind
@@ -50,9 +51,7 @@ deploy:
   script:
     - ./bin/deploy.sh
     - localstack state export ./ls-state-pod.zip
-    - curl "$AWS_ENDPOINT_URL/_localstack/diagnose" | tee ls_diagnose.log
-    - docker ps | tee docker_ps.log
-    - docker inspect localstack-main | tee docker_inspect.log
+    - localstack logs
 
 test:
   stage: test
@@ -60,5 +59,4 @@ test:
     - *default_before_scripts
     - python3 -m pip install -r requirements-dev.txt
   script:
-    - python3 -m pytest tests
-
+    - python3 -m pytest tests || localstack logs
