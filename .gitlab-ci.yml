@@ -46,6 +46,14 @@ default:
 
 deploy:
   stage: deploy
+  rules:
+    - when: never
+      changes:
+        - ./*.md
+        - LICENSE
+        - .circleci/*
+        - .github/*
+    - when: always
   script:
     - ./bin/deploy.sh
     - localstack state export ./ls-state-pod.zip
@@ -53,8 +61,16 @@ deploy:
 
 test:
   stage: test
+  rules:
+    - when: never
+      changes:
+        - ./*.md
+        - LICENSE
+        - .circleci/*
+        - .github/*
+    - when: always
   before_script:
     - *default_before_scripts
     - python3 -m pip install -r requirements-dev.txt
   script:
-    - python3 -m pytest tests || localstack logs
+    - python3 -m pytest tests || localstack logs && exit 1
