@@ -1,4 +1,4 @@
-image: docker:20.10.16-dind
+image: docker:24.0.7-dind-alpine3.18 #docker:20.10.16-dind
 
 stages:
   - deploy
@@ -17,16 +17,16 @@ variables:
   LS_LOG: trace
 
 services:
-  - name: docker:20.10.16-dind
+  - name: docker:24.0.7-dind-alpine3.18 #docker:20.10.16-dind
     alias: docker
     command: ["--tls=false"]
 
 default:
   before_script: &default_before_scripts
     - apk update
-    - apk add --no-cache gcc musl-dev linux-headers bash zip jq curl
-    - apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/main python3~3.9
-    - apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/community py3-psutil~5.8
+    - apk add --no-cache gcc musl-dev linux-headers bash zip jq curl py3-psutil python3
+    # - apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/main python3~3.9
+    # - apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/community py3-psutil~5.8
     - python3 -m ensurepip
     - python3 -m pip install --no-cache --upgrade pip setuptools
     - mkdir -p $PIP_CACHE_DIR
@@ -37,10 +37,6 @@ default:
     - localstack start -d
     - localstack wait -t 30
     - (test -f ./ls-state-pod.zip && localstack state import ./ls-state-pod.zip) || true
-  after_script:
-    - curl "$AWS_ENDPOINT_URL/_localstack/diagnose" | tee ls_diagnose.log
-    - docker ps | tee docker_ps.log
-    - docker inspect localstack-main | tee docker_inspect.log
   cache:
     paths:
       - $CI_PROJECT_DIR/.cache/pip
@@ -54,6 +50,9 @@ deploy:
   script:
     - ./bin/deploy.sh
     - localstack state export ./ls-state-pod.zip
+    - curl "$AWS_ENDPOINT_URL/_localstack/diagnose" | tee ls_diagnose.log
+    - docker ps | tee docker_ps.log
+    - docker inspect localstack-main | tee docker_inspect.log
 
 test:
   stage: test
