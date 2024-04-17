@@ -3,7 +3,10 @@ name: Run Integration Tests
 on:
   push:
     paths-ignore:
-      - 'README.md'
+      - ./*.md
+      - LICENSE
+      - .circleci/*
+      - .gitlab-ci.yml
     branches:
       - main
   pull_request:

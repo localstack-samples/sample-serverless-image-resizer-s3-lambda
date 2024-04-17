@@ -7,7 +7,10 @@ on:
         description: This will be the version of the release, but will also be used as 'tag' for the localstack docker image
   push:
     paths-ignore:
-      - 'README.md'
+      - ./*.md
+      - LICENSE
+      - .circleci/*
+      - .gitlab-ci.yml
     branches:
       - main
             
