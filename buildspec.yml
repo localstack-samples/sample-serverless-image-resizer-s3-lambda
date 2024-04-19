@@ -16,26 +16,16 @@ phases:
     runtime-versions:
       python: 3.11
     commands:
-      - test -d /root/.pyenv/versions/3.9.16 || pyenv install 3.9.16
-      - pyenv global 3.9.16
+      - test -d /root/.pyenv/versions/3.11.6 || pyenv install 3.11.6
+      - pyenv global 3.11.6
       - pip install -r requirements-dev.txt
       - pip install localstack
       - docker pull public.ecr.aws/localstack/localstack-pro:latest
       - docker image tag public.ecr.aws/localstack/localstack-pro:latest localstack/localstack-pro:latest
       - localstack start -d
-      # - name: Load Pod
-      #   uses: LocalStack/setup-localstack/cloud-pods@main
-      #   with:
-      #     name: codebuild-pod
-      #     action: load
   pre_build:
     commands:
       - bin/deploy.sh
-      # - name: Save Pod
-      #   uses: LocalStack/setup-localstack/cloud-pods@main
-      #   with:
-      #     name: codebuild-pod
-      #     action: save
   build:
     commands:
       - pytest tests
@@ -44,5 +34,5 @@ phases:
 
 cache:
   paths:
-    - '/root/.pyenv/versions/3.9.16/**/*'
+    - '/root/.pyenv/versions/3.11.6/**/*'
     
