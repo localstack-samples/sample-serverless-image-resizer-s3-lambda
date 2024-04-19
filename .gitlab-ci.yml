@@ -1,4 +1,4 @@
-image: docker:20.10.16-dind
+image: docker:24.0.7-dind-alpine3.18 # Alpine 3.18's repo contains by default Python v3.11.8
 
 stages:
   - deploy
@@ -15,18 +15,17 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   DEBUG: 1
   LS_LOG: trace
+  LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT: 300
 
 services:
-  - name: docker:20.10.16-dind
+  - name: docker:24.0.7-dind-alpine3.18
     alias: docker
     command: ["--tls=false"]
 
 default:
   before_script: &default_before_scripts
     - apk update
-    - apk add --no-cache gcc musl-dev linux-headers bash zip jq curl
-    - apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/main python3~3.9
-    - apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/v3.15/community py3-psutil~5.8
+    - apk add --no-cache gcc musl-dev linux-headers bash zip jq curl py3-psutil python3
     - python3 -m ensurepip
     - python3 -m pip install --no-cache --upgrade pip setuptools
     - mkdir -p $PIP_CACHE_DIR
@@ -37,10 +36,6 @@ default:
     - localstack start -d
     - localstack wait -t 30
     - (test -f ./ls-state-pod.zip && localstack state import ./ls-state-pod.zip) || true
-  after_script:
-    - curl "$AWS_ENDPOINT_URL/_localstack/diagnose" | tee ls_diagnose.log
-    - docker ps | tee docker_ps.log
-    - docker inspect localstack-main | tee docker_inspect.log
   cache:
     paths:
       - $CI_PROJECT_DIR/.cache/pip
@@ -51,15 +46,31 @@ default:
 
 deploy:
   stage: deploy
+  rules:
+    - when: never
+      changes:
+        - ./*.md
+        - LICENSE
+        - .circleci/*
+        - .github/*
+    - when: always
   script:
     - ./bin/deploy.sh
     - localstack state export ./ls-state-pod.zip
+    - localstack logs
 
 test:
   stage: test
+  rules:
+    - when: never
+      changes:
+        - ./*.md
+        - LICENSE
+        - .circleci/*
+        - .github/*
+    - when: always
   before_script:
     - *default_before_scripts
     - python3 -m pip install -r requirements-dev.txt
   script:
-    - python3 -m pytest tests
-
+    - python3 -m pytest tests || (localstack logs && exit 1)

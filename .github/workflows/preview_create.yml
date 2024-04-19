@@ -3,6 +3,11 @@ name: Create PR Preview
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths-ignore:
+      - ./*.md
+      - LICENSE
+      - .circleci/*
+      - .gitlab-ci.yml
 
 jobs:
   test:
