@@ -73,4 +73,4 @@ test:
     - *default_before_scripts
     - python3 -m pip install -r requirements-dev.txt
   script:
-    - python3 -m pytest tests || localstack logs && exit 1
+    - python3 -m pytest tests || (localstack logs && exit 1)
