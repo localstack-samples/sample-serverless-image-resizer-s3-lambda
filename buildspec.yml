@@ -1,0 +1,38 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_DEFAULT_REGION: us-east-1
+    AWS_REGION: us-east-1
+    AWS_ACCESS_KEY_ID: test
+    AWS_SECRET_ACCESS_KEY: test
+    DEBUG: 1
+    LS_LOG: trace
+  parameter-store:
+    LOCALSTACK_AUTH_TOKEN: /CodeBuild/LOCALSTACK_AUTH_TOKEN
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - test -d /root/.pyenv/versions/3.11.6 || pyenv install 3.11.6
+      - pyenv global 3.11.6
+      - pip install -r requirements-dev.txt
+      - pip install localstack
+      - docker pull public.ecr.aws/localstack/localstack-pro:latest
+      - docker image tag public.ecr.aws/localstack/localstack-pro:latest localstack/localstack-pro:latest
+      - localstack start -d
+  pre_build:
+    commands:
+      - bin/deploy.sh
+  build:
+    commands:
+      - pytest tests
+    finally:
+      - localstack logs
+
+cache:
+  paths:
+    - '/root/.pyenv/versions/3.11.6/**/*'
+    
