@@ -37,7 +37,7 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Start LocalStack
-        uses: LocalStack/setup-localstack@main
+        uses: LocalStack/setup-localstack@refactor_default_action
         with:
           image-tag: ${{ inputs.release-tag || 'latest'}}
           use-pro: 'true'
