@@ -30,15 +30,18 @@ jobs:
           pip install awscli-local
 
       - name: Deploy Preview
-        uses: LocalStack/setup-localstack/preview@main
+        uses: LocalStack/setup-localstack@v0.2.0
         env:
           AWS_DEFAULT_REGION: us-east-1
           AWS_REGION: us-east-1
           AWS_ACCESS_KEY_ID: test
           AWS_SECRET_ACCESS_KEY: test
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}
+          state-backend: ephemeral
+          state-action: start
+          skip-ephemeral-stop: 'true'
           preview-cmd: |
             # Add your custom deployment commands here. 
             # Below is an example for the Image resizer application.

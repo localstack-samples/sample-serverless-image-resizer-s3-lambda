@@ -50,7 +50,7 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Start LocalStack
-        uses: LocalStack/setup-localstack@main
+        uses: LocalStack/setup-localstack@v0.2.0
         with:
           image-tag: 'latest'
           use-pro: 'true'
