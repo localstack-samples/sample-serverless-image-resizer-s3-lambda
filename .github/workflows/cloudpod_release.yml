@@ -37,7 +37,7 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Start LocalStack
-        uses: LocalStack/setup-localstack@refactor_default_action
+        uses: LocalStack/setup-localstack@v0.2.0
         with:
           image-tag: ${{ inputs.release-tag || 'latest'}}
           use-pro: 'true'
@@ -58,6 +58,7 @@ jobs:
         run: |
           pytest tests
       
+      # Not using action as state is not stored as an artifact
       - name: Save the Cloud Pod 
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
