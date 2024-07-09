@@ -17,18 +17,35 @@ on:
     - cron: "0 0 * * 0"
   workflow_dispatch:
     inputs:
-      runner-os:
-        default: ubuntu-latest
-        type: choice
-        options:
-          - ubuntu-latest
-          - macos-latest
+      ubuntu-latest:
+        type: boolean
+        default: true
+      macos-latest:
+        type: boolean
+        default: false
 
 
 jobs:
-  run-it-tests-job:
-    runs-on: ${{ inputs.runner-os || 'ubuntu-latest' }}
+  get-selected-os:
+    runs-on: ubuntu-latest
+    outputs: # This needs to be set if you want to consume the output on another job
+      os-runners: ${{ steps.get-selected-os.outputs.os-runners }}
+    env:
+      INPUTS: ${{ toJson(inputs) }}
     steps:
+      - name: Get selected runner OS
+        id: get-selected-os
+        run: >
+          echo "os-runners=$(jq -cr 'map_values(. // empty) | keys' <<< $INPUTS)" >> $GITHUB_OUTPUT
+
+  run-it-tests-job:
+    needs: get-selected-os
+    strategy:
+      matrix:
+        os: ${{ fromJSON(needs.get-selected-os.outputs.os-runners) }}
+    runs-on:  ${{ matrix.os || 'ubuntu-latest' }}
+    steps:
+        # - run: echo '${{ needs.get-selected-os.outputs.os-runners }}'
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -42,7 +59,10 @@ jobs:
         id: setup-docker-mac
         if: ${{ runner.os == 'macOS' }}
         run: |
-          brew install docker
+          brew update
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 \
+          brew reinstall qemu
+          brew install docker colima
           colima start
 
       - name: Set up Project
