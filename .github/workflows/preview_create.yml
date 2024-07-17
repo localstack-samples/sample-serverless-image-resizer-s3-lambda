@@ -42,6 +42,7 @@ jobs:
           state-backend: ephemeral
           state-action: start
           skip-ephemeral-stop: 'true'
+          include-preview: 'true'
           preview-cmd: |
             # Add your custom deployment commands here. 
             # Below is an example for the Image resizer application.
