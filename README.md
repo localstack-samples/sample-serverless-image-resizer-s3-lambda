@@ -74,7 +74,7 @@ pip install -r requirements-dev.txt
 Start LocalStack Pro with the appropriate CORS configuration for the S3 Website:
 
 ```bash
-LOCALSTACK_API_KEY=... localstack start
+LOCALSTACK_AUTH_TOKEN=... localstack start
 ```
 
 ## Instructions
