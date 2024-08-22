@@ -11,6 +11,7 @@ package-lock.json
 /nosetests.xml
 
 .env
+!.devcontainer/**/.env
 venv
 /.venv*
 /.coverage
