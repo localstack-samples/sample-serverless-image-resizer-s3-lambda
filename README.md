@@ -69,22 +69,37 @@ source .venv/bin/activate
 pip install -r requirements-dev.txt
 ```
 
-### LocalStack
-
-Start LocalStack Pro with the appropriate CORS configuration for the S3 Website:
-
-```bash
-LOCALSTACK_AUTH_TOKEN=... localstack start
-```
-
 ## Instructions
 
-You can create the AWS infrastructure on LocalStack by running `bin/deploy.sh`.
-Make sure you have Python 3.11 activated before running the script.
+You can set up and deploy the sample application on LocalStack by executing the commands in our Makefile. First, create a `.env` file using the provided `.env.example` file as a template, and include your LocalStack token in it. Then, run `make -s start` to initiate LocalStack on your machine.
 
-Here are instructions to deploy it manually step-by-step.
+Next, execute `make -s terraform-setup` to provision the infrastructure on LocalStack using Terraform CLI and its scripts. Alternatively, run `make -s awslocal-setup` to set up the infrastructure with the local AWS CLI.
 
-### Create the buckets
+If you prefer, you can also follow these step-by-step instructions for a manual deployment.
+
+### LocalStack
+
+Start LocalStack Pro with Auth Token:
+
+```bash
+LOCALSTACK_AUTH_TOKEN=... localstack start (-d)
+```
+
+### Terraform
+
+To create the infrastructure using Terraform, run the following commands:
+
+```shell
+cd deployment/terraform
+tflocal init
+tflocal apply --auto-approve
+```
+
+We are using the `tflocal` wrapper to configure the local service endpoints, and send the API requests to LocalStack, instead of AWS.
+
+### AWS CLI
+
+#### Create the buckets
 
 The names are completely configurable via SSM:
 
@@ -93,14 +108,14 @@ awslocal s3 mb s3://localstack-thumbnails-app-images
 awslocal s3 mb s3://localstack-thumbnails-app-resized
 ```
 
-### Put the bucket names into the parameter store
+#### Put the bucket names into the parameter store
 
 ```bash
 awslocal ssm put-parameter --name /localstack-thumbnail-app/buckets/images --type "String" --value "localstack-thumbnails-app-images"
 awslocal ssm put-parameter --name /localstack-thumbnail-app/buckets/resized --type "String" --value "localstack-thumbnails-app-resized"
 ```
 
-### Create the DLQ Topic for failed lambda invokes
+#### Create the DLQ Topic for failed lambda invokes
 
 ```bash
 awslocal sns create-topic --name failed-resize-topic
@@ -115,9 +130,9 @@ awslocal sns subscribe \
     --notification-endpoint my-email@example.com
 ```
 
-### Create the lambdas
+#### Create the lambdas
 
-#### S3 pre-signed POST URL generator
+##### S3 pre-signed POST URL generator
 
 This Lambda is responsible for generating pre-signed POST URLs to upload files to an S3 bucket.
 
@@ -143,7 +158,7 @@ awslocal lambda create-function-url-config \
 
 Copy the `FunctionUrl` from the response, you will need it later to make the app work.
 
-### Image lister lambda
+#### Image lister lambda
 
 The `list` Lambda is very similar:
 
@@ -166,7 +181,7 @@ awslocal lambda create-function-url-config \
     --auth-type NONE
 ```
 
-### Resizer Lambda
+#### Resizer Lambda
 
 ```bash
 (
@@ -189,7 +204,7 @@ awslocal lambda create-function \
     --environment Variables="{STAGE=local}"
 ```
 
-### Connect the S3 bucket to the resizer lambda
+#### Connect the S3 bucket to the resizer lambda
 
 ```bash
 awslocal s3api put-bucket-notification-configuration \
@@ -197,7 +212,7 @@ awslocal s3api put-bucket-notification-configuration \
     --notification-configuration "{\"LambdaFunctionConfigurations\": [{\"LambdaFunctionArn\": \"$(awslocal lambda get-function --function-name resize | jq -r .Configuration.FunctionArn)\", \"Events\": [\"s3:ObjectCreated:*\"]}]}"
 ```
 
-### Create the static s3 webapp
+#### Create the static s3 webapp
 
 ```bash
 awslocal s3 mb s3://webapp
@@ -205,7 +220,7 @@ awslocal s3 sync --delete ./website s3://webapp
 awslocal s3 website s3://webapp --index-document index.html
 ```
 
-### Using the application
+#### Using the application
 
 Once deployed, visit http://webapp.s3-website.localhost.localstack.cloud:4566
 
