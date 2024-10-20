@@ -24,10 +24,9 @@ terraform-destroy:
 		tflocal destroy --auto-approve;
 
 start:
-		LOCALSTACK_AUTH_TOKEN=$(LOCALSTACK_AUTH_TOKEN) localstack start -d
+		@LOCALSTACK_AUTH_TOKEN=$(LOCALSTACK_AUTH_TOKEN) localstack start -d
 
 stop:
-		@echo
 		localstack stop
 
 .PHONY: build awslocal-setup terraform-setup terraform-destroy start stop
