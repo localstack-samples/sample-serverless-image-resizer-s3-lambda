@@ -289,7 +289,7 @@ resource "aws_cloudfront_origin_access_identity" "cdn_identity" {
 
 resource "aws_s3_bucket_policy" "website_bucket_policy" {
   bucket = aws_s3_bucket.website_bucket.bucket
-  policy = templatefile("../policies/website_bucket_policy.json.tpl", {
+  policy = templatefile("../policies/website_s3_bucket.json.tpl", {
     cdn_identity_arn   = aws_cloudfront_origin_access_identity.cdn_identity.iam_arn
     website_bucket_arn = aws_s3_bucket.website_bucket.arn
   })
