@@ -70,19 +70,19 @@ resource "aws_ssm_parameter" "images_resized_bucket_ssm" {
 
 resource "aws_iam_policy" "lambdas_ssm" {
   name   = "LambdasAccessSsm"
-  policy = file("../policies/lambda_ssm.json")
+  policy = file("policies/lambda_ssm.json")
 }
 
 # Presign Lambda
 
 resource "aws_iam_role" "presign_lambda_role" {
   name               = "PresignLambdaRole"
-  assume_role_policy = file("../policies/lambda.json")
+  assume_role_policy = file("policies/lambda.json")
 }
 
 resource "aws_iam_policy" "presign_lambda_s3_buckets" {
   name = "PresignLambdaS3AccessPolicy"
-  policy = templatefile("../policies/presign_lambda_s3_buckets.json.tpl", {
+  policy = templatefile("policies/presign_lambda_s3_buckets.json.tpl", {
     images_bucket = aws_s3_bucket.images_bucket.bucket
   })
 }
@@ -120,12 +120,12 @@ resource "aws_lambda_function_url" "presign_lambda_function" {
 
 resource "aws_iam_role" "list_lambda_role" {
   name               = "ListLambdaRole"
-  assume_role_policy = file("../policies/lambda.json")
+  assume_role_policy = file("policies/lambda.json")
 }
 
 resource "aws_iam_policy" "list_lambda_s3_buckets" {
   name = "ListLambdaS3AccessPolicy"
-  policy = templatefile("../policies/list_lambda_s3_buckets.json.tpl", {
+  policy = templatefile("policies/list_lambda_s3_buckets.json.tpl", {
     images_bucket         = aws_s3_bucket.images_bucket.bucket,
     images_resized_bucket = aws_s3_bucket.image_resized_bucket.bucket
   })
@@ -164,12 +164,12 @@ resource "aws_lambda_function_url" "list_lambda_function" {
 
 resource "aws_iam_role" "resize_lambda_role" {
   name               = "ResizeLambdaRole"
-  assume_role_policy = file("../policies/lambda.json")
+  assume_role_policy = file("policies/lambda.json")
 }
 
 resource "aws_iam_policy" "resize_lambda_s3_buckets" {
   name = "ResizeLambdaS3Buckets"
-  policy = templatefile("../policies/resize_lambda_s3_buckets.json.tpl", {
+  policy = templatefile("policies/resize_lambda_s3_buckets.json.tpl", {
     images_resized_bucket = aws_s3_bucket.image_resized_bucket.bucket
   })
 }
@@ -181,7 +181,7 @@ resource "aws_iam_role_policy_attachment" "resize_lambda_s3_buckets" {
 
 resource "aws_iam_policy" "resize_lambda_sns" {
   name = "ResizeLambdaSNS"
-  policy = templatefile("../policies/resize_lambda_sns.json.tpl", {
+  policy = templatefile("policies/resize_lambda_sns.json.tpl", {
     failure_notifications_topic_arn = aws_sns_topic.failure_notifications.arn,
     resize_lambda_arn = aws_lambda_function.resize_lambda.arn
   })
@@ -289,7 +289,7 @@ resource "aws_cloudfront_origin_access_identity" "cdn_identity" {
 
 resource "aws_s3_bucket_policy" "website_bucket_policy" {
   bucket = aws_s3_bucket.website_bucket.bucket
-  policy = templatefile("../policies/website_s3_bucket.json.tpl", {
+  policy = templatefile("policies/website_s3_bucket.json.tpl", {
     cdn_identity_arn   = aws_cloudfront_origin_access_identity.cdn_identity.iam_arn
     website_bucket_arn = aws_s3_bucket.website_bucket.arn
   })
