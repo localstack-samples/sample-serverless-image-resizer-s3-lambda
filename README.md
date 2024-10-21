@@ -71,9 +71,9 @@ pip install -r requirements-dev.txt
 
 ## Instructions
 
-You can set up and deploy the sample application on LocalStack by executing the commands in our Makefile. First, create a `.env` file using the provided `.env.example` file as a template, and include your LocalStack token in it. Then, run `make -s start` to initiate LocalStack on your machine.
+You can set up and deploy the sample application on LocalStack by executing the commands in our Makefile. First, create a `.env` file using the provided `.env.example` file as a template, and include your LocalStack token in it. Then, run `make start` to initiate LocalStack on your machine.
 
-Next, execute `make -s terraform-setup` to provision the infrastructure on LocalStack using Terraform CLI and its scripts. Alternatively, run `make -s awslocal-setup` to set up the infrastructure with the local AWS CLI.
+Next, execute `make terraform-setup` to provision the infrastructure on LocalStack using Terraform CLI and its scripts. Alternatively, run `make awslocal-setup` to set up the infrastructure with the local AWS CLI.
 
 If you prefer, you can also follow these step-by-step instructions for a manual deployment.
 
@@ -98,6 +98,10 @@ tflocal apply --auto-approve
 We are using the `tflocal` wrapper to configure the local service endpoints, and send the API requests to LocalStack, instead of AWS.
 
 ### AWS CLI
+
+You can execute the following commands to set up the infrastructure using `awslocal`, a wrapper for the AWS CLI. 
+
+All the commands are also available in the `deployment/awslocal/deploy.sh` script.
 
 #### Create the buckets
 

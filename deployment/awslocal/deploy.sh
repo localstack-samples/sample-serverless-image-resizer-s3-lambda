@@ -2,8 +2,6 @@
 
 export AWS_DEFAULT_REGION=us-east-1
 
-bin/build_lambdas.sh
-
 awslocal s3 mb s3://localstack-thumbnails-app-images
 awslocal s3 mb s3://localstack-thumbnails-app-resized
 

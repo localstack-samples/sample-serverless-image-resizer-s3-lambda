@@ -9,7 +9,8 @@ build:
 		bin/build_lambdas.sh;
 
 awslocal-setup:
-		bin/deploy.sh
+		$(MAKE) build
+		deployment/awslocal/deploy.sh
 
 terraform-setup:
 		$(MAKE) build
