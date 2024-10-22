@@ -1,6 +1,5 @@
 export AWS_ACCESS_KEY_ID ?= test
 export AWS_SECRET_ACCESS_KEY ?= test
-export LOCAL_RUN ?= true
 SHELL := /bin/bash
 
 include .env
@@ -23,7 +22,7 @@ terraform-setup:		## Deploy the application locally using `tflocal`, a wrapper f
 		cd deployment/terraform; \
 		tflocal init; \
 		echo "Deploying Terraform configuration 🚀"; \
-		tflocal apply  --auto-approve -var="local_run=${LOCAL_RUN}"; \
+		tflocal apply  --auto-approve; \
 		echo "Paste the function URLs above to the WebApp 🎉";
 
 terraform-destroy:		## Destroy all resources created locally using terraform scripts

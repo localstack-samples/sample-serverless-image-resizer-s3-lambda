@@ -9,35 +9,17 @@ terraform {
 
 provider "aws" {
   region                     = "us-east-1"
-  skip_requesting_account_id = var.local_run
-}
-
-variable "local_run" {
-  description = "Flag to determine if running locally using LocalStack"
-  type        = bool
-}
-
-resource "random_integer" "images_bucket_id" {
-  min = 0
-  max = 10000
-}
-
-resource "random_integer" "image_resized_bucket_id" {
-  min = 0
-  max = 10000
-}
-
-resource "random_integer" "website_bucket_id" {
-  min = 0
-  max = 10000
+  skip_requesting_account_id = true
 }
 
 locals {
-  env_variables               = var.local_run ? { STAGE = "local" } : {}
+  # TO-DO: The environment variable STAGE is required for Lambdas to connect to LocalStack endpoints. 
+  # The environment variable can be removed once Lambdas are adapted to support transparent endpoint injection.
+  env_variables               = { STAGE = "local" }
   root_dir                    = "${path.module}/../.."
-  images_bucket               = "localstack-thumbnails-app-images${var.local_run ? "" : "-${random_integer.images_bucket_id.result}"}"
-  image_resized_bucket        = "localstack-thumbnails-app-resized${var.local_run ? "" : "-${random_integer.image_resized_bucket_id.result}"}"
-  website_bucket              = "localstack-website${var.local_run ? "" : "-${random_integer.website_bucket_id.result}"}"
+  images_bucket               = "localstack-thumbnails-app-images"
+  image_resized_bucket        = "localstack-thumbnails-app-resized"
+  website_bucket              = "localstack-website"
   failure_notifications_email = "my-email@example.com"
 }
 
