@@ -45,9 +45,13 @@ jobs:
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
 
+      - name: Build lambdas
+        run: |
+          bin/build_lambdas.sh
+
       - name: Deploy infrastructure
         run: |
-          bin/deploy.sh
+          deployment/awslocal/deploy.sh
 
       - name: Run Tests
         env:
