@@ -29,7 +29,7 @@ jobs:
           pip install awscli-local
 
       - name: Deploy Preview
-        uses: LocalStack/setup-localstack@main
+        uses: LocalStack/setup-localstack@HarshCasper-patch-1
         env:
           LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
         with:
