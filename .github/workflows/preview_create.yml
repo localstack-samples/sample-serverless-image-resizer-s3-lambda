@@ -7,7 +7,6 @@ on:
       - ./*.md
       - LICENSE
       - .circleci/*
-      - .gitlab-ci.yml
 
 jobs:
   test:
@@ -30,13 +29,13 @@ jobs:
           pip install awscli-local
 
       - name: Deploy Preview
-        uses: LocalStack/setup-localstack@v0.2.2
+        uses: LocalStack/setup-localstack@v0.2.4
         env:
           AWS_DEFAULT_REGION: us-east-1
           AWS_REGION: us-east-1
           AWS_ACCESS_KEY_ID: test
           AWS_SECRET_ACCESS_KEY: test
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           state-backend: ephemeral
