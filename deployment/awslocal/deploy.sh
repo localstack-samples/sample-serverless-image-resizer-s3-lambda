@@ -14,7 +14,6 @@ awslocal sns subscribe \
     --protocol email \
     --notification-endpoint my-email@example.com
 
-(cd lambdas/presign; rm -f lambda.zip; zip lambda.zip handler.py)
 awslocal lambda create-function \
     --function-name presign \
     --runtime python3.11 \
@@ -29,8 +28,6 @@ awslocal lambda wait function-active-v2 --function-name presign
 awslocal lambda create-function-url-config \
     --function-name presign \
     --auth-type NONE
-
-(cd lambdas/list; rm -f lambda.zip; zip lambda.zip handler.py)
 awslocal lambda create-function \
     --function-name list \
     --runtime python3.11 \
@@ -46,15 +43,6 @@ awslocal lambda create-function-url-config \
     --function-name list \
     --auth-type NONE
 
-(
-    cd lambdas/resize
-    rm -rf package lambda.zip
-    mkdir package
-    pip install -r requirements.txt -t package --platform manylinux2014_x86_64 --only-binary=:all:
-    zip lambda.zip handler.py
-    cd package
-    zip -r ../lambda.zip *;
-)
 awslocal lambda create-function \
     --function-name resize \
     --runtime python3.11 \
