@@ -1,4 +1,4 @@
-name: Create and Test LocalStack Cloud Pod
+name: Create and Test LocalStack State File
 
 on:
   schedule:
@@ -17,13 +17,13 @@ permissions:
   actions: read
 
 jobs:
-  create-pod:
-    name: Create Cloud Pod
+  create-state-file:
+    name: Create State Files
     runs-on: ubuntu-latest
     permissions:
       actions: write
     outputs:
-      pod_artifact_name: cloud-pod-${{ github.run_id }}
+      state_files_artifact_name: state-file-${{ github.run_id }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -50,26 +50,26 @@ jobs:
         run: |
           bin/build_lambdas.sh && deployment/awslocal/deploy.sh
 
-      - name: Export LocalStack State (Cloud Pod)
+      - name: Export LocalStack State File
         id: export_state
         env:
           LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
         run: |
           echo "Exporting LocalStack state..."
-          localstack state export cloud-pod.zip
-          ls -la cloud-pod.zip # Verify the file exists
-          echo "pod_artifact_name=cloud-pod-${{ github.run_id }}" >> $GITHUB_OUTPUT
+          localstack state export state-file.zip
+          ls -la state-file.zip # Verify the file exists
+          echo "state_files_artifact_name=state-file-${{ github.run_id }}" >> $GITHUB_OUTPUT
 
-      - name: Upload Cloud Pod Artifact
+      - name: Upload State File Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.export_state.outputs.pod_artifact_name }}
-          path: cloud-pod.zip
+          name: ${{ steps.export_state.outputs.state_files_artifact_name }}
+          path: state-file.zip
           retention-days: 1
 
-  test-pod:
-    name: Test Cloud Pod
-    needs: create-pod
+  test-state-file:
+    name: Test State File
+    needs: create-state-file
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -91,21 +91,20 @@ jobs:
           install-awslocal: 'true'
         env:
           DEBUG: 1
-          POD_LOAD_CLI_TIMEOUT: 300
           LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 
-      - name: Download Cloud Pod Artifact
+      - name: Download State File Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ needs.create-pod.outputs.pod_artifact_name }}
+          name: ${{ needs.create-state-file.outputs.state_files_artifact_name }}
 
-      - name: Inject Pod (Import State)
+      - name: Inject State File
         env:
           LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
         run: |
-          echo "Importing LocalStack state from cloud-pod.zip..."
+          echo "Importing LocalStack state from state-file.zip..."
           ls -la # Check if download was successful
-          localstack state import cloud-pod.zip
+          localstack state import state-file.zip
 
       - name: Run Tests
         env:
@@ -145,7 +144,3 @@ jobs:
         with:
           name: diagnose.json.gz
           path: ./diagnose.json.gz
-
-      - name: Prevent Workflow from becoming Stale
-        if: always() && github.ref == 'refs/heads/main'
-        uses: liskin/gh-workflow-keepalive@v1
