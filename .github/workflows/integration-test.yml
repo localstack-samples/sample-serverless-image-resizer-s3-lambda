@@ -50,14 +50,15 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Start LocalStack
-        uses: LocalStack/setup-localstack@v0.2.2
+        uses: LocalStack/setup-localstack@v0.2.4
         with:
           image-tag: 'latest'
           use-pro: 'true'
           configuration: LS_LOG=trace
           install-awslocal: 'true'
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+
       - name: Build lambdas
         run: |
           bin/build_lambdas.sh
