@@ -22,7 +22,7 @@ on:
         type: choice
         options:
           - ubuntu-latest
-          - macos-latest
+          - macos-13
 
 
 jobs:
@@ -30,12 +30,10 @@ jobs:
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
-        runner:
-          - ubuntu-latest
-          - macos-latest
+        runner: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.runner-os && fromJSON(format('["{0}"]', github.event.inputs.runner-os))) || fromJSON('["ubuntu-latest", "macos-13"]') }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.11
         id: setup-python
@@ -43,10 +41,19 @@ jobs:
         with:
           python-version: 3.11
 
-      - name: Docker setup (macos only)
-        id: setup-docker-mac
-        if: ${{ runner.os == 'macOS' }}
+      - name: Debug Runner Context (Ubuntu)
+        if: runner.os == 'Linux' # Only run this debug step on Linux
         run: |
+          echo "DEBUG: Runner OS is ${{ runner.os }}"
+          echo "DEBUG: Event name is ${{ github.event_name }}"
+          echo "DEBUG: Evaluating runner.os == 'macOS' -> ${{ runner.os == 'macOS' }}"
+          echo "DEBUG: Evaluating github.event_name == 'schedule' -> ${{ github.event_name == 'schedule' }}"
+          echo "DEBUG: Evaluating full condition -> ${{ runner.os == 'macOS' && github.event_name == 'schedule' }}"
+
+      - name: Docker setup (macos only)
+        if: ${{ runner.os == 'macOS' && github.event_name == 'schedule' }}
+        run: |
+          brew install colima
           brew install docker
           colima start
 
