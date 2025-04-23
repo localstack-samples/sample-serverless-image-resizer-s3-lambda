@@ -1,17 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "<= 5.72.1"
-    }
-  }
-}
-
-provider "aws" {
-  region                     = "us-east-1"
-  skip_requesting_account_id = true
-}
-
 locals {
   # TO-DO: The environment variable STAGE is required for Lambdas to connect to LocalStack endpoints. 
   # The environment variable can be removed once Lambdas are adapted to support transparent endpoint injection.
