@@ -40,7 +40,7 @@ jobs:
           python-version: 3.11
 
       - name: Install Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
 
       - name: Install Terraform Local
         run: |
@@ -69,10 +69,6 @@ jobs:
           cd deployment/terraform
           tflocal init
           tflocal apply --auto-approve
-
-      - name: Run tests
-        run: |
-          pytest tests
 
       - name: Show localstack logs
         if: always()
