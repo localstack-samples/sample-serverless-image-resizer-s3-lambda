@@ -36,7 +36,8 @@ default:
     - echo -e "${dind_ip}\tlocalhost.localstack.cloud\n" >> /etc/hosts
     - localstack start -d
     - localstack wait -t 30
-    - (test -f ./ls-state-pod.zip && localstack state import ./ls-state-pod) || true
+    - mkdir -p /usr/lib/localstack
+    - (test -f ./ls-state-pod.zip && localstack state import ./ls-state-pod.zip) || true
   cache:
     paths:
       - $CI_PROJECT_DIR/.cache/pip
@@ -58,7 +59,8 @@ deploy:
   script:
     - ./bin/build_lambdas.sh
     - ./deployment/awslocal/deploy.sh
-    - localstack state export ls-state-pod
+    - mkdir -p /usr/lib/localstack
+    - localstack state export ls-state-pod.zip
 
 test:
   stage: test
