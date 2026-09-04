@@ -20,25 +20,29 @@ jobs:
             # Currently highest available 3.11 on CircleCI runner
             test -d /opt/circleci/.pyenv/versions/3.11.1 || pyenv install 3.11.1
             pyenv global 3.11.1
-      - localstack/start        
+      - run:
+          name: Install lstk
+          command: npm install -g @localstack/lstk
       - run:
           name: Install dependencies
           command:
             pip3 install -r requirements-dev.txt --upgrade
-      - localstack/wait
+      - run:
+          name: Start LocalStack
+          command: lstk start
       - run:
           name: Build lambdas
           command:
             deployment/build-lambdas.sh
-            
+
       - run:
           name: Deploy infrastructure
           command:
-            deployment/awslocal/deploy.sh
-            
+            deployment/aws/deploy.sh
+
       - run:
           name: Export state
-          command: localstack state export ls-state.zip
+          command: lstk save ls-state.zip
       - persist_to_workspace:
           root: .
           paths:
@@ -58,8 +62,8 @@ jobs:
         AWS_REGION: us-east-1
         AWS_ACCESS_KEY_ID: test
         AWS_SECRET_ACCESS_KEY: test
-        DEBUG: 1
-        LS_LOG: trace
+        LOCALSTACK_DEBUG: 1
+        LOCALSTACK_LS_LOG: trace
     steps:
       - restore_cache:
           key: python-deps-
@@ -67,18 +71,22 @@ jobs:
           name: Choose python version
           command:
             pyenv global 3.11.1
-      - localstack/start        
+      - run:
+          name: Install lstk
+          command: npm install -g @localstack/lstk
       - checkout
       - run:
           name: Install dependencies
           command:
             pip3 install -r requirements-dev.txt
-      - localstack/wait
+      - run:
+          name: Start LocalStack
+          command: lstk start
       - attach_workspace:
           at: .
       - run:
           name: Import state
-          command: test -f ls-state.zip && localstack state import ls-state.zip
+          command: test -f ls-state.zip && lstk load ls-state.zip
       - run:
           name: Run Tests
           command:
@@ -86,7 +94,7 @@ jobs:
       - run:
           when: on_fail
           name: Dump Localstack logs
-          command: localstack logs | tee localstack.log
+          command: lstk logs | tee localstack.log
       - store_artifacts:
           path: localstack.log
 

@@ -33,9 +33,9 @@ The following diagram shows the architecture that this sample application builds
 
 ## Prerequisites
 
-- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) to activate LocalStack.
-- [`lstk` CLI](https://docs.localstack.cloud/aws/tooling/lstk/).
-- [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`lstk aws` proxy](https://docs.localstack.cloud/aws/tooling/lstk/).
+- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/aws/getting-started/auth-token/) to activate LocalStack.
+- [`lstk` CLI](https://docs.localstack.cloud/aws/developer-tools/running-localstack/lstk/).
+- [AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) with the [`lstk aws` proxy](https://docs.localstack.cloud/aws/developer-tools/running-localstack/lstk/).
 - [Python 3.11](https://www.python.org/downloads/) (same version as the Lambda runtime)
 - [`make`](https://www.gnu.org/software/make/) for running the sample application via the provided Makefile
 
