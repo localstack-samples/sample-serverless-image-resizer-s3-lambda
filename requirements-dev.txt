@@ -8,5 +8,3 @@ mypy-boto3-lambda
 black
 pytest
 awscli
-awscli-local
-terraform-local

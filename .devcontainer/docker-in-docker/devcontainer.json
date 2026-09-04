@@ -3,7 +3,7 @@
 	"image": "mcr.microsoft.com/devcontainers/base:jammy",
 
 	"remoteEnv": {
-		// Activate LocalStack Pro: https://docs.localstack.cloud/getting-started/auth-token/
+		// Activate LocalStack Pro: https://docs.localstack.cloud/aws/getting-started/auth-token/
 		"LOCALSTACK_AUTH_TOKEN": "${localEnv:LOCALSTACK_AUTH_TOKEN}",  // required for Pro, not processed via template due to security reasons
 		"LOCALSTACK_API_KEY": "${localEnv:LOCALSTACK_API_KEY}",
 		// LocalStack configuration: https://docs.localstack.cloud/references/configuration/
@@ -21,6 +21,8 @@
 	},
 
 	// 👇 Features to add to the Dev Container. More info: https://containers.dev/implementors/features.
+	// NOTE(lstk): the localstack-cli feature below installs the legacy `localstack` CLI and
+	// *local wrappers, not lstk — there is no lstk-based devcontainer feature yet.
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
 		"ghcr.io/localstack/devcontainer-feature/localstack-cli:latest": {

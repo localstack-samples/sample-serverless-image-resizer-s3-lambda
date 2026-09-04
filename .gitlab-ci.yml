@@ -13,9 +13,9 @@ variables:
   PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
-  DEBUG: 1
-  LS_LOG: trace
-  LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT: 300
+  LOCALSTACK_DEBUG: 1
+  LOCALSTACK_LS_LOG: trace
+  LOCALSTACK_LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT: 300
 
 services:
   - name: docker:24.0.7-dind-alpine3.18
@@ -25,19 +25,19 @@ services:
 default:
   before_script: &default_before_scripts
     - apk update
-    - apk add --no-cache gcc musl-dev linux-headers bash zip jq curl py3-psutil python3
+    - apk add --no-cache gcc musl-dev linux-headers bash zip jq curl py3-psutil python3 nodejs npm
     - python3 -m ensurepip
     - python3 -m pip install --no-cache --upgrade pip setuptools
     - mkdir -p $PIP_CACHE_DIR
-    - python3 -m pip install localstack awscli awscli-local
+    - python3 -m pip install awscli
+    - npm install -g @localstack/lstk
     - docker pull localstack/localstack-pro:latest
     # Gitlab has changed to ipv6, but LocalStack does not support it
     - dind_ip="$(getent ahostsv4 docker | cut -d' ' -f1 | head -n1)"
     - echo -e "${dind_ip}\tlocalhost.localstack.cloud\n" >> /etc/hosts
-    - localstack start -d
-    - localstack wait -t 30
+    - lstk start
     - mkdir -p /usr/lib/localstack
-    - (test -f ./ls-state-pod.zip && localstack state import ./ls-state-pod.zip) || true
+    - (test -f ./ls-state-pod.zip && lstk load ./ls-state-pod.zip) || true
   cache:
     paths:
       - $CI_PROJECT_DIR/.cache/pip
@@ -58,9 +58,9 @@ deploy:
     - when: always
   script:
     - ./deployment/build-lambdas.sh
-    - ./deployment/awslocal/deploy.sh
+    - ./deployment/aws/deploy.sh
     - mkdir -p /usr/lib/localstack
-    - localstack state export ls-state-pod.zip
+    - lstk save ls-state-pod.zip
 
 test:
   stage: test
@@ -78,4 +78,4 @@ test:
     - *default_before_scripts
     - python3 -m pip install -r requirements-dev.txt
   script:
-    - python3 -m pytest tests || (localstack logs && exit 1)
+    - python3 -m pytest tests || (lstk logs && exit 1)

@@ -6,8 +6,8 @@ env:
     AWS_REGION: us-east-1
     AWS_ACCESS_KEY_ID: test
     AWS_SECRET_ACCESS_KEY: test
-    DEBUG: 1
-    LS_LOG: trace
+    LOCALSTACK_DEBUG: 1
+    LOCALSTACK_LS_LOG: trace
   parameter-store:
     LOCALSTACK_AUTH_TOKEN: /CodeBuild/LOCALSTACK_AUTH_TOKEN
 
@@ -15,23 +15,24 @@ phases:
   install:
     runtime-versions:
       python: 3.11
+      nodejs: latest
     commands:
       - test -d /root/.pyenv/versions/3.11.6 || pyenv install 3.11.6
       - pyenv global 3.11.6
       - pip install -r requirements-dev.txt
-      - pip install localstack
+      - npm install -g @localstack/lstk
       - docker pull public.ecr.aws/localstack/localstack-pro:latest
       - docker image tag public.ecr.aws/localstack/localstack-pro:latest localstack/localstack-pro:latest
-      - localstack start -d
+      - lstk start
   pre_build:
     commands:
       - deployment/build-lambdas.sh
-      - deployment/awslocal/deploy.sh
+      - deployment/aws/deploy.sh
   build:
     commands:
       - pytest tests
     finally:
-      - localstack logs
+      - lstk logs
 
 cache:
   paths:

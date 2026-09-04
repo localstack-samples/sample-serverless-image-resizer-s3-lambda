@@ -5,6 +5,8 @@
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
 	// 👇 Features to add to the Dev Container. More info: https://containers.dev/implementors/features.
+	// NOTE(lstk): the localstack-cli feature below installs the legacy `localstack` CLI and
+	// *local wrappers, not lstk — there is no lstk-based devcontainer feature yet.
 	"features": {
 		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
 		"ghcr.io/localstack/devcontainer-feature/localstack-cli:latest": {
